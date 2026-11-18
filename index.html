@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mariam Gameel Ibrahim | Full-Stack Software Engineer</title>
+  <meta name="description" content="Portfolio of Mariam Gameel Ibrahim – Full-Stack Software Engineer specializing in React, Laravel, Node.js, and Local AI Integrations.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sand: {
+              DEFAULT: '#AE9679',
+              light: '#BEAB92',
+              dark: '#967A60',
+              deep: '#7E634B'
+            },
+            alabaster: {
+              DEFAULT: '#F1DDC0',
+              card: '#F6E8D2',
+              warm: '#DAC4A3',
+              border: '#CEB694'
+            },
+            burgundy: {
+              DEFAULT: '#4D0A0D',
+              wine: '#5F2B24',
+              light: '#6F1B22',
+              dark: '#380407'
+            },
+            espresso: {
+              DEFAULT: '#1E0A05',
+              soft: '#331B15',
+              mocha: '#76543F'
+            }
+          },
+          fontFamily: {
+            serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          },
+          boxShadow: {
+            'bento': '0 14px 34px -4px rgba(77, 10, 13, 0.09), 0 4px 12px rgba(30, 10, 5, 0.04)',
+            'pill': '0 8px 24px -2px rgba(77, 10, 13, 0.28)',
+            'card-hover': '0 20px 40px -8px rgba(77, 10, 13, 0.16)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #AE9679;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #5F2B24;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4D0A0D;
+    }
+
+    /* Ambient noise & subtle grain overlay */
+    .bg-grain {
+      background-color: #AE9679;
+      background-image: radial-gradient(rgba(241, 221, 192, 0.14) 1px, transparent 0);
+      background-size: 24px 24px;
+    }
+
+    /* Modal Animation */
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-animate {
+      animation: modalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  </style>
+</head>
+<body class="bg-grain text-espresso font-sans antialiased min-h-screen selection:bg-burgundy selection:text-alabaster py-6 px-3 sm:px-6 lg:px-8">
+
+  <!-- ==================== TOAST NOTIFICATION ==================== -->
+  <div id="toast" class="fixed bottom-6 right-6 z-[100] transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="bg-espresso text-alabaster px-4 py-3 rounded-2xl shadow-2xl border border-alabaster.border/40 flex items-center gap-3">
+      <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+        <i data-lucide="check" class="w-3.5 h-3.5"></i>
+      </div>
+      <span id="toast-message" class="text-xs font-medium">Notification message</span>
+    </div>
+  </div>
+
+  <!-- ==================== TOP FLOATING NAVIGATION PILL ==================== -->
+  <header class="max-w-4xl mx-auto mb-8 sticky top-4 z-50 transition-all duration-300">
+    <nav class="bg-burgundy text-alabaster px-4 sm:px-6 py-2.5 rounded-full shadow-pill flex items-center justify-between border border-burgundy-light/40 backdrop-blur-md">
+      <!-- Home / Brand -->
+      <a href="#hero" class="flex items-center gap-2 group">
+        <div class="w-8 h-8 rounded-full bg-burgundy-wine flex items-center justify-center text-alabaster border border-alabaster/20 group-hover:scale-105 transition-transform">
+          <i data-lucide="terminal" class="w-4 h-4"></i>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-serif font-bold text-base leading-tight tracking-wide text-alabaster">Mariam Gameel</span>
+          <span class="text-[10px] text-alabaster.warm tracking-wider uppercase opacity-80 hidden sm:inline">Software Engineer</span>
+        </div>
+      </a>
+
+      <!-- Quick Nav Links matching reference tabs -->
+      <div class="hidden md:flex items-center gap-5 text-xs font-medium tracking-wide">
+        <a href="#about" class="text-alabaster/80 hover:text-white transition-colors">About</a>
+        <a href="#projects" class="text-alabaster/80 hover:text-white transition-colors">Projects</a>
+        <a href="#stack" class="text-alabaster/80 hover:text-white transition-colors">Stack</a>
+        <a href="#credentials" class="text-alabaster/80 hover:text-white transition-colors">Credentials</a>
+      </div>
+
+      <!-- Action & Links -->
+      <div class="flex items-center gap-2 sm:gap-2.5">
+        <!-- Status indicator -->
+        <span class="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full bg-burgundy-wine/80 text-[11px] text-alabaster/90 border border-alabaster/10">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          Open for Roles
+        </span>
+
+        <!-- Social Icons -->
+        <a href="https://github.com/mariamgameel" target="_blank" rel="noopener noreferrer" title="GitHub" class="p-2 rounded-full hover:bg-burgundy-wine text-alabaster/90 transition-colors">
+          <i data-lucide="github" class="w-4 h-4"></i>
+        </a>
+        <a href="https://www.linkedin.com/in/mariam-gameel" target="_blank" rel="noopener noreferrer" title="LinkedIn" class="p-2 rounded-full hover:bg-burgundy-wine text-alabaster/90 transition-colors">
+          <i data-lucide="linkedin" class="w-4 h-4"></i>
+        </a>
+
+        <!-- Download CV Button -->
+        <a href="Mariam_Gameel_CV.pdf" download="Mariam_Gameel_CV.pdf" class="flex items-center gap-1.5 bg-alabaster text-burgundy font-semibold text-xs px-3.5 py-1.5 rounded-full hover:bg-white transition-all shadow-sm">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span>Resume</span>
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ==================== MAIN BENTO CONTAINER ==================== -->
+  <main class="max-w-4xl mx-auto space-y-6">
+
+    <!-- ==================== HERO BENTO CARD ==================== -->
+    <section id="hero" class="bg-alabaster-card rounded-3xl p-6 sm:p-8 shadow-bento border border-alabaster-border/60 relative overflow-hidden">
+      <!-- Decorative background glow -->
+      <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-alabaster.warm/30 blur-3xl pointer-events-none"></div>
+
+      <!-- Hero Upper: Editorial Showcase + Live Monospace Terminal -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center mb-8">
+        
+        <!-- Left Column: Value Proposition & Engineering Narrative -->
+        <div class="md:col-span-7 space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-burgundy/10 text-burgundy text-xs font-semibold border border-burgundy/20">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+            Full-Stack Software Engineer & AI Integrator
+          </div>
+          
+          <h1 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-espresso leading-[1.12]">
+            Engineering Scalable, Human-Centered Software.
+          </h1>
+
+          <p class="text-espresso.soft text-sm sm:text-base leading-relaxed">
+            Bridging an academic foundation in <strong>Psychology</strong> with modern <strong>Full-Stack Engineering</strong>. Specializing in responsive React interfaces, secure RESTful APIs in Laravel 12 & Node.js, and privacy-first local AI model integration with Ollama.
+          </p>
+
+          <!-- Floating Badges Row (Inspired by the Reference Floating Overlays) -->
+          <div class="flex flex-wrap items-center gap-2 pt-2">
+            <!-- AWS Badge -->
+            <div class="inline-flex items-center gap-2 bg-burgundy text-alabaster px-3.5 py-1.5 rounded-2xl text-xs font-medium shadow-sm border border-burgundy-light">
+              <i data-lucide="cloud" class="w-3.5 h-3.5 text-amber-300"></i>
+              <span>AWS Certified Developer (DVA-C02)</span>
+            </div>
+            <!-- Ollama AI Badge -->
+            <div class="inline-flex items-center gap-2 bg-burgundy-wine text-alabaster px-3.5 py-1.5 rounded-2xl text-xs font-medium shadow-sm border border-burgundy-light">
+              <i data-lucide="cpu" class="w-3.5 h-3.5 text-emerald-300"></i>
+              <span>Ollama Local LLM & RAG</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Interactive Terminal Widget (Pivoting the reference photo) -->
+        <div class="md:col-span-5">
+          <div class="bg-espresso rounded-2xl p-4 shadow-xl border border-espresso.soft font-mono text-xs text-alabaster relative">
+            <!-- Terminal Header -->
+            <div class="flex items-center justify-between pb-3 mb-3 border-b border-espresso.soft/70">
+              <div class="flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
+                <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+                <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+              </div>
+              <span class="text-[10px] text-alabaster.warm opacity-70">bash ~ mariam@engineer</span>
+            </div>
+
+            <!-- Terminal Output Window -->
+            <div id="terminal-screen" class="space-y-2 text-[11px] leading-relaxed min-h-[170px] max-h-[220px] overflow-y-auto">
+              <div class="text-sand-light">$ mariam.summary()</div>
+              <div class="text-amber-200/90">{</div>
+              <div class="pl-3 space-y-0.5">
+                <div><span class="text-rose-300">"name"</span>: <span class="text-emerald-300">"Mariam Gameel Ibrahim"</span>,</div>
+                <div><span class="text-rose-300">"degree"</span>: <span class="text-emerald-300">"B.Ed. Psychology (Suez Canal Univ)"</span>,</div>
+                <div><span class="text-rose-300">"diploma"</span>: <span class="text-emerald-300">"AI Software Development (Digilians)"</span>,</div>
+                <div><span class="text-rose-300">"stack"</span>: [<span class="text-cyan-300">"React"</span>, <span class="text-cyan-300">"Laravel 12"</span>, <span class="text-cyan-300">"Node.js"</span>, <span class="text-cyan-300">"Ollama"</span>],</div>
+                <div><span class="text-rose-300">"cloud"</span>: <span class="text-amber-300">"AWS Certified Associate (DVA-C02)"</span></div>
+              </div>
+              <div class="text-amber-200/90">}</div>
+              <div class="text-sand-light pt-1 flex items-center gap-1">
+                <span>$</span>
+                <span class="text-emerald-300">ready to build scalable solutions</span>
+                <span class="w-1.5 h-3 bg-emerald-400 inline-block animate-pulse"></span>
+              </div>
+            </div>
+
+            <!-- Interactive Terminal Prompt Buttons -->
+            <div class="mt-3 pt-2.5 border-t border-espresso.soft flex items-center gap-1.5 overflow-x-auto text-[10px]">
+              <span class="text-alabaster/50 shrink-0">Try:</span>
+              <button onclick="runCommand('stack')" class="px-2 py-0.5 rounded bg-espresso.soft hover:bg-burgundy text-alabaster.warm hover:text-white transition-colors">stack</button>
+              <button onclick="runCommand('projects')" class="px-2 py-0.5 rounded bg-espresso.soft hover:bg-burgundy text-alabaster.warm hover:text-white transition-colors">projects</button>
+              <button onclick="runCommand('contact')" class="px-2 py-0.5 rounded bg-espresso.soft hover:bg-burgundy text-alabaster.warm hover:text-white transition-colors">contact</button>
+              <button onclick="runCommand('clear')" class="px-2 py-0.5 rounded bg-espresso.soft hover:bg-rose-900 text-alabaster.warm hover:text-white transition-colors">clear</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Hero Lower: 3 Highlight Circles + Narrative Bio (Exact Bento Structure from Reference) -->
+      <div class="pt-6 border-t border-alabaster-border/70 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+        
+        <!-- 3 Highlight Circles (Technical Core Pillars) -->
+        <div class="md:col-span-4 flex items-center justify-start sm:justify-center gap-3">
+          
+          <!-- Circle 1: Full-Stack Architecture -->
+          <div onclick="openPillarModal('fullstack')" class="flex flex-col items-center group cursor-pointer" title="Click to view details">
+            <div class="w-16 h-16 rounded-full bg-burgundy text-alabaster flex flex-col items-center justify-center p-2 shadow-md border-2 border-alabaster transition-all group-hover:scale-105 group-hover:bg-burgundy-light">
+              <i data-lucide="layers" class="w-6 h-6 text-alabaster"></i>
+            </div>
+            <span class="text-[11px] font-semibold text-espresso mt-1.5">Full-Stack</span>
+            <span class="text-[9px] text-espresso.mocha">React & Laravel</span>
+          </div>
+
+          <!-- Circle 2: AI & Cloud Integration -->
+          <div onclick="openPillarModal('ai')" class="flex flex-col items-center group cursor-pointer" title="Click to view details">
+            <div class="w-16 h-16 rounded-full bg-burgundy-wine text-alabaster flex flex-col items-center justify-center p-2 shadow-md border-2 border-alabaster transition-all group-hover:scale-105 group-hover:bg-burgundy">
+              <i data-lucide="bot" class="w-6 h-6 text-alabaster"></i>
+            </div>
+            <span class="text-[11px] font-semibold text-espresso mt-1.5">AI & Cloud</span>
+            <span class="text-[9px] text-espresso.mocha">Ollama & AWS</span>
+          </div>
+
+          <!-- Circle 3: Psychology / Cognitive UX -->
+          <div onclick="openPillarModal('psychology')" class="flex flex-col items-center group cursor-pointer" title="Click to view details">
+            <div class="w-16 h-16 rounded-full bg-sand-dark text-alabaster flex flex-col items-center justify-center p-2 shadow-md border-2 border-alabaster transition-all group-hover:scale-105 group-hover:bg-sand-deep">
+              <i data-lucide="brain" class="w-6 h-6 text-alabaster"></i>
+            </div>
+            <span class="text-[11px] font-semibold text-espresso mt-1.5">Psychology</span>
+            <span class="text-[9px] text-espresso.mocha">Cognitive UX</span>
+          </div>
+
+        </div>
+
+        <!-- Bio Narrative Block (Matches reference typography and placement) -->
+        <div id="about" class="md:col-span-8 pl-0 md:pl-4">
+          <h3 class="font-serif text-xl sm:text-2xl font-bold text-espresso mb-1.5">
+            The Analytical & Human-Centered Advantage
+          </h3>
+          <p class="text-xs sm:text-sm text-espresso.soft leading-relaxed">
+            Code succeeds when it aligns with how humans think and work. Having studied Psychology, I view software through both an architectural and behavioral lens. This distinct duality directly enhances user experience, API ergonomics, predictive error handling, and systemic reliability across every layer of the stack.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== MIDDLE BENTO ROW: CREDENTIALS & METRICS ==================== -->
+    <section class="grid grid-cols-1 md:grid-cols-12 gap-6">
+
+      <!-- Left Card: Software Engineer Identity & Contact (Replaces Instagram Card) -->
+      <div class="md:col-span-7 bg-alabaster-card rounded-3xl p-6 sm:p-7 shadow-bento border border-alabaster-border/60 flex flex-col justify-between">
+        <div>
+          <!-- Header & Handle -->
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="font-serif text-2xl font-bold text-espresso">Mariam Gameel Ibrahim</h2>
+                <i data-lucide="badge-check" class="w-5 h-5 text-burgundy" title="Verified Software Engineer"></i>
+              </div>
+              <p class="text-xs text-espresso.mocha font-medium mt-0.5">Cairo, Egypt • Full-Stack Software Engineer</p>
+            </div>
+            <div class="flex items-center gap-1.5 text-espresso.mocha">
+              <a href="https://github.com/mariamgameel" target="_blank" rel="noopener noreferrer" class="p-2 hover:bg-alabaster.warm/40 rounded-full transition-colors" title="GitHub">
+                <i data-lucide="github" class="w-4 h-4"></i>
+              </a>
+              <a href="https://www.linkedin.com/in/mariam-gameel" target="_blank" rel="noopener noreferrer" class="p-2 hover:bg-alabaster.warm/40 rounded-full transition-colors" title="LinkedIn">
+                <i data-lucide="linkedin" class="w-4 h-4"></i>
+              </a>
+              <button onclick="copyToClipboard('mariamgameel51@gmail.com', 'Email copied!')" class="p-2 hover:bg-alabaster.warm/40 rounded-full transition-colors" title="Copy Email">
+                <i data-lucide="mail" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Stats Row (Matches the 0 posts / 208 followers pattern) -->
+          <div class="grid grid-cols-3 gap-3 py-4 my-2 border-y border-alabaster-border/60 text-center">
+            <div class="hover:bg-alabaster.warm/20 p-1.5 rounded-xl transition-colors">
+              <div class="font-serif text-2xl font-bold text-espresso">2+</div>
+              <div class="text-[11px] text-espresso.mocha uppercase tracking-wider font-semibold">Production Systems</div>
+            </div>
+            <div class="hover:bg-alabaster.warm/20 p-1.5 rounded-xl transition-colors">
+              <div class="font-serif text-2xl font-bold text-espresso">13+</div>
+              <div class="text-[11px] text-espresso.mocha uppercase tracking-wider font-semibold">Certifications</div>
+            </div>
+            <div class="hover:bg-alabaster.warm/20 p-1.5 rounded-xl transition-colors">
+              <div class="font-serif text-2xl font-bold text-espresso">5</div>
+              <div class="text-[11px] text-espresso.mocha uppercase tracking-wider font-semibold">Languages</div>
+            </div>
+          </div>
+
+          <!-- Professional Experience Mini-Timeline -->
+          <div id="experience" class="space-y-3 my-4">
+            <!-- ACUD Internship -->
+            <div class="bg-alabaster.warm/30 rounded-xl p-3 border border-alabaster-border/40 flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg bg-burgundy text-alabaster flex items-center justify-center shrink-0 mt-0.5">
+                <i data-lucide="cpu" class="w-4 h-4"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-xs font-bold text-espresso truncate">ACUD – AI Software Engineer Intern</h4>
+                  <span class="text-[10px] text-espresso.mocha font-mono">OCT 2026</span>
+                </div>
+                <p class="text-[11px] text-espresso.soft mt-0.5">PHP, Laravel, REST APIs, and local AI chatbot integration with Ollama.</p>
+              </div>
+            </div>
+
+            <!-- Nexus Design Studio Internship -->
+            <div class="bg-alabaster.warm/30 rounded-xl p-3 border border-alabaster-border/40 flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg bg-sand-dark text-alabaster flex items-center justify-center shrink-0 mt-0.5">
+                <i data-lucide="code-2" class="w-4 h-4"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-xs font-bold text-espresso truncate">Nexus Design Studio – Full-Stack Intern</h4>
+                  <span class="text-[10px] text-espresso.mocha font-mono">FEB – OCT 2025</span>
+                </div>
+                <p class="text-[11px] text-espresso.soft mt-0.5">End-to-end full-stack web development, responsive UIs, database logic & API integration.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons (Matches the Edit Profile / Share Profile buttons in reference) -->
+        <div class="flex items-center gap-3 pt-2">
+          <a href="mailto:mariamgameel51@gmail.com" class="flex-1 text-center bg-burgundy text-alabaster font-semibold text-xs py-2.5 px-4 rounded-xl hover:bg-burgundy-light transition-all shadow-sm flex items-center justify-center gap-2">
+            <i data-lucide="send" class="w-3.5 h-3.5"></i>
+            <span>Get in Touch</span>
+          </a>
+          <a href="Mariam_Gameel_CV.pdf" download="Mariam_Gameel_CV.pdf" class="flex-1 text-center bg-alabaster.warm/60 hover:bg-alabaster.warm text-espresso font-semibold text-xs py-2.5 px-4 rounded-xl border border-alabaster-border/80 transition-all flex items-center justify-center gap-2">
+            <i data-lucide="file-text" class="w-3.5 h-3.5 text-burgundy"></i>
+            <span>Download CV</span>
+          </a>
+          <button onclick="copyToClipboard('mariamgameel51@gmail.com', 'Email copied to clipboard!')" title="Copy Email" class="p-2.5 rounded-xl bg-alabaster.warm/40 hover:bg-alabaster.warm border border-alabaster-border/60 text-espresso transition-colors">
+            <i data-lucide="copy" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Card: Dual Education & Linguistic Versatility (Replaces TikTok / Pinterest widgets) -->
+      <div class="md:col-span-5 space-y-6">
+        
+        <!-- Education Bento Box (Burgundy Elegance) -->
+        <div class="bg-burgundy text-alabaster rounded-3xl p-6 shadow-bento border border-burgundy-light/40 relative overflow-hidden">
+          <div class="flex items-center gap-2.5 mb-3">
+            <div class="w-8 h-8 rounded-full bg-burgundy-wine flex items-center justify-center text-amber-300">
+              <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h3 class="font-serif text-lg font-bold tracking-wide">Education & Specialization</h3>
+              <p class="text-[10px] text-alabaster.warm/70 uppercase">Dual Discipline Foundations</p>
+            </div>
+          </div>
+
+          <div class="space-y-3 text-xs">
+            <div class="border-b border-burgundy-light/50 pb-2.5">
+              <div class="font-semibold text-alabaster">Digilians Specialized Diploma</div>
+              <div class="text-[11px] text-alabaster.warm/90">AI-Based Software Development (2025–2026)</div>
+              <p class="text-[10px] text-alabaster/70 mt-0.5">Full-Stack, DB Management, AI Integrations & Software Eng.</p>
+            </div>
+
+            <div>
+              <div class="font-semibold text-alabaster">Bachelor of Education (B.Ed.)</div>
+              <div class="text-[11px] text-alabaster.warm/90">Psychology Dept, Suez Canal University (2019–2023)</div>
+              <p class="text-[10px] text-alabaster/70 mt-0.5">Behavioral analytics, cognitive models, research methodology.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Languages & Global Communication Card -->
+        <div class="bg-alabaster-card rounded-3xl p-5 shadow-bento border border-alabaster-border/60">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-espresso uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="globe-2" class="w-3.5 h-3.5 text-burgundy"></i>
+              Languages Spoken
+            </span>
+            <span class="text-[10px] text-espresso.mocha font-mono">5 Idioms</span>
+          </div>
+          
+          <div class="flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-lg bg-burgundy text-alabaster font-medium text-[11px]">Arabic (Native)</span>
+            <span class="px-2.5 py-1 rounded-lg bg-alabaster.warm text-espresso font-medium text-[11px]">English (C1 Proficient)</span>
+            <span class="px-2.5 py-1 rounded-lg bg-alabaster.warm text-espresso font-medium text-[11px]">Turkish (B2 Independent)</span>
+            <span class="px-2.5 py-1 rounded-lg bg-alabaster.warm/60 text-espresso.mocha text-[11px]">French (A1)</span>
+            <span class="px-2.5 py-1 rounded-lg bg-alabaster.warm/60 text-espresso.mocha text-[11px]">Spanish (A1)</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== PRODUCTION PROJECTS BENTO (Replaces Art Gallery) ==================== -->
+    <section id="projects" class="space-y-4">
+      <!-- Section Header with Search & Filter Bar -->
+      <div class="bg-burgundy text-alabaster rounded-2xl px-5 py-3.5 shadow-md border border-burgundy-light flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-full bg-burgundy-wine flex items-center justify-center text-alabaster">
+            <i data-lucide="folder-git-2" class="w-4 h-4"></i>
+          </div>
+          <span class="font-serif font-bold text-lg tracking-wide">Featured Production Systems</span>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="flex items-center gap-1.5 text-xs font-medium overflow-x-auto w-full sm:w-auto">
+          <button onclick="filterProjects('all')" id="filter-all" class="filter-btn px-3 py-1 rounded-full bg-alabaster text-burgundy font-semibold text-[11px] transition-all">All</button>
+          <button onclick="filterProjects('fullstack')" id="filter-fullstack" class="filter-btn px-3 py-1 rounded-full bg-burgundy-wine/80 hover:bg-burgundy-wine text-alabaster text-[11px] transition-all">Full-Stack</button>
+          <button onclick="filterProjects('ai')" id="filter-ai" class="filter-btn px-3 py-1 rounded-full bg-burgundy-wine/80 hover:bg-burgundy-wine text-alabaster text-[11px] transition-all">AI & Local LLM</button>
+          <button onclick="filterProjects('healthcare')" id="filter-healthcare" class="filter-btn px-3 py-1 rounded-full bg-burgundy-wine/80 hover:bg-burgundy-wine text-alabaster text-[11px] transition-all">Healthcare</button>
+        </div>
+      </div>
+
+      <!-- Project Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Project 1: HRMS (AI-Powered) -->
+        <div data-category="fullstack ai" class="project-card bg-alabaster-card rounded-3xl p-6 sm:p-7 shadow-bento border border-alabaster-border/60 flex flex-col justify-between group hover:border-burgundy/40 hover:shadow-card-hover transition-all">
+          <div>
+            <!-- Badges -->
+            <div class="flex items-center justify-between mb-3">
+              <span class="px-3 py-1 rounded-full bg-burgundy text-alabaster text-[10px] font-semibold tracking-wide uppercase">
+                AI + Enterprise Web
+              </span>
+              <div class="flex items-center gap-1 text-espresso.mocha font-mono text-xs">
+                <i data-lucide="git-branch" class="w-3.5 h-3.5"></i>
+                <span>Laravel 12 • React</span>
+              </div>
+            </div>
+
+            <!-- Title -->
+            <h3 class="font-serif text-2xl font-bold text-espresso group-hover:text-burgundy transition-colors">
+              HRMS – AI Human Resources Platform
+            </h3>
+
+            <!-- Description -->
+            <p class="text-xs sm:text-sm text-espresso.soft mt-2.5 leading-relaxed">
+              Full-stack enterprise application designed to streamline HR operations, recruitment, and automated interview scheduling with custom interviewer availability, cancellations, and evaluation workflows.
+            </p>
+
+            <!-- Key Engineering Highlights -->
+            <div class="mt-4 space-y-2 bg-alabaster.warm/30 rounded-2xl p-3.5 border border-alabaster-border/50 text-xs">
+              <div class="flex items-start gap-2">
+                <i data-lucide="bot" class="w-3.5 h-3.5 text-burgundy shrink-0 mt-0.5"></i>
+                <span><strong>AI Chatbot Integration:</strong> Locally hosted LLMs via <strong>Ollama</strong> for privacy-compliant query answering.</span>
+              </div>
+              <div class="flex items-start gap-2">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-burgundy shrink-0 mt-0.5"></i>
+                <span><strong>Security & RBAC:</strong> Laravel Sanctum, role-based access control, and modular middleware.</span>
+              </div>
+              <div class="flex items-start gap-2">
+                <i data-lucide="calendar" class="w-3.5 h-3.5 text-burgundy shrink-0 mt-0.5"></i>
+                <span><strong>Interview Engine:</strong> Candidate booking, availability matrices, and standardized evaluation forms.</span>
+              </div>
+            </div>
+
+            <!-- Tech Chips -->
+            <div class="flex flex-wrap gap-1.5 mt-4">
+              <span class="px-2 py-0.5 rounded-md bg-alabaster.warm text-espresso font-mono text-[10px]">PHP</span>
+              <span class="px-2 py-0.5 rounded-md bg-alabaster.warm text-espresso font-mono text-[10px]">Laravel 12</span>
+              <span class="px-2 py-0.5 rounded-md bg-alabaster.warm text-espresso font-mono text-[10px]">React</span>
+              <span class="px-2 py-0.5 rounded-md bg-alabaster.warm text-espresso font-mono text-[10px]">MySQL</span>
+              <span class="px-2 py-0.5 rounded-md bg-burgundy/10 text-burgundy font-mono text-[10px] font-semibold">Ollama LLM</span>
+              <span class="px-2 py-0.5 rounded-md bg-alabaster.warm text-espresso font-mono text-[10px]">Sanctum RBAC</span>
+            </div>
+          </div>
+
+          <!-- Footer Links & Modal Trigger -->
+          <div class="pt-5 mt-4 border-t border-alabaster-border/60 flex items-center justify-between text-xs">
+            <span class="text-espresso.mocha font-mono">Status: Production Ready</span>
+            <button onclick="openProjectModal('hrms')" class="inline-flex items-center gap-1.5 font-semibold text-burgundy hover:text-burgundy-light group-hover:translate-x-1 transition-transform">
+              <span>Inspect Architecture</span>
+              <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Project 2: Pediatric Handover Clinical System -->
+        <div data-category="fullstack healthcare" class="project-card bg-alabaster-card rounded-3xl p-6 sm:p-7 shadow-bento border border-alabaster-border/60 flex flex-col justify-between group hover:border-burgundy/40 hover:shadow-card-hover transition-all">
+          <div>
+            <!-- Badges -->
+            <div class="flex items-center justify-between mb-3">
+              <span class="px-3 py-1 rounded-full bg-sand-dark text-alabaster text-[10px] font-semibold tracking-wide uppercase">
+                Healthcare Tech
+              </span>
+              <div class="flex items-center gap-1 text-espresso.mocha font-mono text-xs">
+                <i data-lucide="git-branch" class="w-3.5 h-3.5"></i>
+                <span>MERN Stack • Security</span>
+              </div>
+            </div>
+
+            <!-- Title -->
+            <h3 class="font-serif text-2xl font-bold text-espresso group-hover:text-burgundy transition-colors">
+              Pediatric Handover System
+            </h3>
+
+            <!-- Description -->
+            <p class="text-xs sm:text-sm text-espresso.soft mt-2.5 leading-relaxed">
+              Full-stack clinical workflow application digitizing pediatric patient handovers, streamlining clinical follow-ups, and eliminating medical communication gaps across physician shift transitions.
+            </p>
+
+            <!-- Key Engineering Highlights -->
+            <div class="mt-4 space-y-2 bg-alabaster.warm/30 rounded-2xl p-3.5 border border-alabaster-border/50 text-xs">
+              <div class="flex items-start gap-2">
+                <i data-lucide="lock" class="w-3.5 h-3.5 text-burgundy shrink-0 mt-0.5"></i>
+                <span><strong>Healthcare Security:</strong> JWT auth, bcryptjs, Helmet headers, CORS policies, Joi validation.</span>
+              </div>
+              <div class="flex items-start gap-2">
+                <i data-lucide="activity" class="w-3.5 h-3.5 text-burgundy shrink-0 mt-0.5"></i>
+                <span><strong>Clinical Follow-Up Engine:</strong> Real-time patient status updates and multi-department handover tracking.</span>
+              </div>
+              <div class="flex items-start gap-2">
+                <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-burgundy shrink-0 mt-0.5"></i>
+                <span><strong>Resilience:</strong> Centralized error handling, standardized API contracts, and modular architecture.</span>
+              </div>
+            </div>
+
+            <!-- Tech Chips -->
+            <div class="flex flex-wrap gap-1.5 mt-4">
+              <span class="px-2 py-0.5 rounded-md bg-alabaster.warm text-espresso font-mono text-[10px]">React</span>
+              <span class="px-2 py-0.5 rounded-md bg-alabaster.warm text-espresso font-mono text-[10px]">Node.js</span>
+              <span class="px-2 py-0.5 rounded-md bg-alabaster.warm text-espresso font-mono text-[10px]">Express.js</span>
+              <span class="px-2 py-0.5 rounded-md bg-alabaster.warm text-espresso font-mono text-[10px]">MongoDB</span>
+              <span class="px-2 py-0.5 rounded-md bg-burgundy/10 text-burgundy font-mono text-[10px] font-semibold">JWT / RBAC</span>
+              <span class="px-2 py-0.5 rounded-md bg-alabaster.warm text-espresso font-mono text-[10px]">Helmet / OWASP</span>
+            </div>
+          </div>
+
+          <!-- Footer Links & Modal Trigger -->
+          <div class="pt-5 mt-4 border-t border-alabaster-border/60 flex items-center justify-between text-xs">
+            <span class="text-espresso.mocha font-mono">Status: Clinical Grade</span>
+            <button onclick="openProjectModal('pediatric')" class="inline-flex items-center gap-1.5 font-semibold text-burgundy hover:text-burgundy-light group-hover:translate-x-1 transition-transform">
+              <span>Inspect Architecture</span>
+              <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== SKILLS & TECHNICAL STACK MATRIX ==================== -->
+    <section id="stack" class="bg-alabaster-card rounded-3xl p-6 sm:p-8 shadow-bento border border-alabaster-border/60">
+      <div class="flex items-center justify-between mb-6 pb-4 border-b border-alabaster-border/60">
+        <div>
+          <h2 class="font-serif text-2xl font-bold text-espresso">Technical Stack Matrix</h2>
+          <p class="text-xs text-espresso.mocha mt-0.5">Categorized breakdown of programming languages, frameworks, and infrastructure</p>
+        </div>
+        <div class="hidden sm:flex items-center gap-2 text-xs font-mono text-espresso.mocha">
+          <i data-lucide="terminal" class="w-4 h-4 text-burgundy"></i>
+          <span>Production Verified</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+        
+        <!-- Column 1: Core & Languages -->
+        <div class="bg-alabaster.warm/30 rounded-2xl p-4 border border-alabaster-border/40">
+          <div class="font-serif font-bold text-base text-burgundy mb-2.5 flex items-center gap-1.5">
+            <i data-lucide="code" class="w-4 h-4"></i>
+            <span>Languages</span>
+          </div>
+          <ul class="space-y-1.5 text-espresso.soft">
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-burgundy"></span>JavaScript (ES6+)</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-burgundy"></span>PHP (8.x & Laravel 12)</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-burgundy"></span>SQL (Relational Queries)</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-burgundy"></span>HTML5 & CSS3</li>
+          </ul>
+        </div>
+
+        <!-- Column 2: Frontend & UI -->
+        <div class="bg-alabaster.warm/30 rounded-2xl p-4 border border-alabaster-border/40">
+          <div class="font-serif font-bold text-base text-burgundy mb-2.5 flex items-center gap-1.5">
+            <i data-lucide="layout" class="w-4 h-4"></i>
+            <span>Frontend</span>
+          </div>
+          <ul class="space-y-1.5 text-espresso.soft">
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-burgundy"></span>React (Hooks, State, Virtual DOM)</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-burgundy"></span>Tailwind CSS</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-burgundy"></span>Bootstrap</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-burgundy"></span>Responsive Web Architecture</li>
+          </ul>
+        </div>
+
+        <!-- Column 3: Backend & Databases -->
+        <div class="bg-alabaster.warm/30 rounded-2xl p-4 border border-alabaster-border/40">
+          <div class="font-serif font-bold text-base text-burgundy mb-2.5 flex items-center gap-1.5">
+            <i data-lucide="server" class="w-4 h-4"></i>
+            <span>Backend & DB</span>
+          </div>
+          <ul class="space-y-1.5 text-espresso.soft">
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-burgundy"></span>Node.js & Express.js</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-burgundy"></span>Laravel & Eloquent ORM</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-burgundy"></span>RESTful API Design</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-burgundy"></span>MySQL, MongoDB, PostgreSQL</li>
+          </ul>
+        </div>
+
+        <!-- Column 4: AI, Cloud & Security -->
+        <div class="bg-alabaster.warm/30 rounded-2xl p-4 border border-alabaster-border/40">
+          <div class="font-serif font-bold text-base text-burgundy mb-2.5 flex items-center gap-1.5">
+            <i data-lucide="shield" class="w-4 h-4"></i>
+            <span>AI, Cloud & Security</span>
+          </div>
+          <ul class="space-y-1.5 text-espresso.soft">
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-burgundy"></span>Ollama & Local LLMs (RAG)</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-burgundy"></span>AWS Cloud Services</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-burgundy"></span>Docker, Git & CI/CD Concepts</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-burgundy"></span>JWT, RBAC, OWASP Top 10</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== CERTIFICATIONS CREDENTIALS MARQUEE ==================== -->
+    <section id="credentials" class="bg-burgundy text-alabaster rounded-3xl p-6 sm:p-7 shadow-bento border border-burgundy-light/40">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2.5">
+          <i data-lucide="award" class="w-5 h-5 text-amber-300"></i>
+          <h2 class="font-serif text-xl font-bold tracking-wide">Professional Certifications & Badges</h2>
+        </div>
+        <span class="text-xs text-alabaster.warm/80 font-mono">13 Credentials</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+        
+        <div class="bg-burgundy-wine/60 rounded-xl p-3 border border-alabaster/10 flex items-start gap-2.5">
+          <i data-lucide="cloud-check" class="w-4 h-4 text-amber-300 shrink-0 mt-0.5"></i>
+          <div>
+            <div class="font-semibold text-alabaster">AWS Certified Developer – Associate</div>
+            <div class="text-[10px] text-amber-300/80 font-mono">DVA-C02 • AWS</div>
+          </div>
+        </div>
+
+        <div class="bg-burgundy-wine/60 rounded-xl p-3 border border-alabaster/10 flex items-start gap-2.5">
+          <i data-lucide="cloud" class="w-4 h-4 text-amber-300 shrink-0 mt-0.5"></i>
+          <div>
+            <div class="font-semibold text-alabaster">AWS Cloud Practitioner</div>
+            <div class="text-[10px] text-alabaster.warm/70">Amazon Web Services</div>
+          </div>
+        </div>
+
+        <div class="bg-burgundy-wine/60 rounded-xl p-3 border border-alabaster/10 flex items-start gap-2.5">
+          <i data-lucide="layers" class="w-4 h-4 text-cyan-300 shrink-0 mt-0.5"></i>
+          <div>
+            <div class="font-semibold text-alabaster">Advanced React & Front-End</div>
+            <div class="text-[10px] text-alabaster.warm/70">Meta (Coursera)</div>
+          </div>
+        </div>
+
+        <div class="bg-burgundy-wine/60 rounded-xl p-3 border border-alabaster/10 flex items-start gap-2.5">
+          <i data-lucide="git-merge" class="w-4 h-4 text-rose-300 shrink-0 mt-0.5"></i>
+          <div>
+            <div class="font-semibold text-alabaster">DevOps & CI/CD Automation</div>
+            <div class="text-[10px] text-alabaster.warm/70">Packt Publishing</div>
+          </div>
+        </div>
+
+        <div class="bg-burgundy-wine/60 rounded-xl p-3 border border-alabaster/10 flex items-start gap-2.5">
+          <i data-lucide="terminal" class="w-4 h-4 text-emerald-300 shrink-0 mt-0.5"></i>
+          <div>
+            <div class="font-semibold text-alabaster">JavaScript Programming & Git</div>
+            <div class="text-[10px] text-alabaster.warm/70">Meta & Packt</div>
+          </div>
+        </div>
+
+        <div class="bg-burgundy-wine/60 rounded-xl p-3 border border-alabaster/10 flex items-start gap-2.5">
+          <i data-lucide="check-circle-2" class="w-4 h-4 text-blue-300 shrink-0 mt-0.5"></i>
+          <div>
+            <div class="font-semibold text-alabaster">Delivering Quality with Agility</div>
+            <div class="text-[10px] text-alabaster.warm/70">IBM (Coursera)</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="pt-8 pb-12 text-center text-xs text-espresso.mocha space-y-3">
+      <div class="flex items-center justify-center gap-6 font-medium">
+        <a href="https://github.com/mariamgameel" target="_blank" rel="noopener noreferrer" class="hover:text-burgundy transition-colors flex items-center gap-1.5">
+          <i data-lucide="github" class="w-4 h-4"></i>
+          <span>github.com/mariamgameel</span>
+        </a>
+        <a href="https://www.linkedin.com/in/mariam-gameel" target="_blank" rel="noopener noreferrer" class="hover:text-burgundy transition-colors flex items-center gap-1.5">
+          <i data-lucide="linkedin" class="w-4 h-4"></i>
+          <span>linkedin.com/in/mariam-gameel</span>
+        </a>
+        <button onclick="copyToClipboard('mariamgameel51@gmail.com', 'Email copied!')" class="hover:text-burgundy transition-colors flex items-center gap-1.5">
+          <i data-lucide="mail" class="w-4 h-4"></i>
+          <span>mariamgameel51@gmail.com</span>
+        </button>
+      </div>
+      <p class="opacity-80">
+        Designed & Engineered with Editorial Bento Precision • © 2026 Mariam Gameel Ibrahim
+      </p>
+    </footer>
+
+  </main>
+
+  <!-- ==================== INTERACTIVE ARCHITECTURE MODAL ==================== -->
+  <div id="project-modal" class="fixed inset-0 z-[90] hidden bg-espresso/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-alabaster-card rounded-3xl p-6 sm:p-8 max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl border border-alabaster-border modal-animate relative">
+      <button onclick="closeProjectModal()" class="absolute top-5 right-5 p-2 rounded-full bg-alabaster.warm/50 hover:bg-alabaster.warm text-espresso transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div id="modal-content" class="space-y-4">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== INTERACTIVE SCRIPTS ==================== -->
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Copy to clipboard helper
+    function copyToClipboard(text, message) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(message || 'Copied to clipboard!');
+      });
+    }
+
+    // Toast notification function
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-message');
+      toastMsg.textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      }, 2600);
+    }
+
+    // Interactive Terminal commands
+    function runCommand(cmd) {
+      const screen = document.getElementById('terminal-screen');
+      let response = '';
+
+      if (cmd === 'stack') {
+        response = `
+<div class="text-sand-light pt-1">$ mariam.stack</div>
+<div class="text-emerald-300">
+Frontend: React, Tailwind CSS, Bootstrap, HTML5/CSS3<br>
+Backend: Node.js, Express.js, PHP, Laravel 12, REST APIs<br>
+Databases: MySQL, MongoDB, PostgreSQL, Eloquent ORM<br>
+AI & Cloud: Ollama, Local LLMs, RAG, AWS DVA-C02, Docker
+</div>`;
+      } else if (cmd === 'projects') {
+        response = `
+<div class="text-sand-light pt-1">$ mariam.projects</div>
+<div class="text-emerald-300">
+1. HRMS (Laravel 12, React, MySQL, Ollama Local LLMs, Sanctum)<br>
+2. Pediatric Handover System (React, Node.js, Express, MongoDB, OWASP)
+</div>`;
+      } else if (cmd === 'contact') {
+        response = `
+<div class="text-sand-light pt-1">$ mariam.contact</div>
+<div class="text-emerald-300">
+Email: mariamgameel51@gmail.com<br>
+Mobile: (+20) 1066758908<br>
+GitHub: github.com/mariamgameel<br>
+LinkedIn: linkedin.com/in/mariam-gameel
+</div>`;
+      } else if (cmd === 'clear') {
+        screen.innerHTML = `
+<div class="text-sand-light">$ terminal cleared</div>
+<div class="text-sand-light pt-1 flex items-center gap-1">
+  <span>$</span>
+  <span class="text-emerald-300">ready for commands</span>
+  <span class="w-1.5 h-3 bg-emerald-400 inline-block animate-pulse"></span>
+</div>`;
+        return;
+      }
+
+      screen.innerHTML += response;
+      screen.scrollTop = screen.scrollHeight;
+    }
+
+    // Project Category Filtering
+    function filterProjects(category) {
+      const cards = document.querySelectorAll('.project-card');
+      const buttons = document.querySelectorAll('.filter-btn');
+
+      // Update button styles
+      buttons.forEach(btn => {
+        btn.classList.remove('bg-alabaster', 'text-burgundy', 'font-semibold');
+        btn.classList.add('bg-burgundy-wine/80', 'text-alabaster');
+      });
+
+      const activeBtn = document.getElementById('filter-' + category);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-burgundy-wine/80', 'text-alabaster');
+        activeBtn.classList.add('bg-alabaster', 'text-burgundy', 'font-semibold');
+      }
+
+      // Filter cards
+      cards.forEach(card => {
+        const cats = card.getAttribute('data-category').split(' ');
+        if (category === 'all' || cats.includes(category)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // Modal Architecture Details
+    const projectDetails = {
+      hrms: {
+        title: "HRMS – AI-Powered Human Resources Platform",
+        badge: "Enterprise Full-Stack • Laravel 12 & React",
+        overview: "A comprehensive enterprise solution designed to modernize corporate HR management, talent acquisition, and automated scheduling with local, privacy-compliant artificial intelligence.",
+        highlights: [
+          "<strong>Local LLM Integration:</strong> Implemented locally-hosted LLMs using Ollama for confidential employee HR policy Q&A without sending private corporate data to external APIs.",
+          "<strong>Interview Scheduling & Evaluation Engine:</strong> Built real-time interviewer availability booking, cancellations, and structured interview evaluation rubrics.",
+          "<strong>Security & Auth:</strong> Secured via Laravel Sanctum, Role-Based Access Control (RBAC), and standardized API response formats."
+        ],
+        techStack: ["PHP 8.x", "Laravel 12", "React", "MySQL", "Ollama LLMs", "Laravel Sanctum", "Postman", "Git"],
+        links: {
+          github: "https://github.com/mariamgameel"
+        }
+      },
+      pediatric: {
+        title: "Pediatric Handover Healthcare Clinical System",
+        badge: "Healthcare Full-Stack • MERN & Medical Security",
+        overview: "A clinical system built to eliminate communication gaps in hospital pediatric wards during physician shift handovers, patient status follow-ups, and emergency updates.",
+        highlights: [
+          "<strong>Healthcare Security Compliance:</strong> Defended against OWASP Top 10 vulnerabilities with Helmet security headers, strict CORS, Joi input schema validation, and bcryptjs hashing.",
+          "<strong>Clinical Follow-Up Engine:</strong> Track patient acuity scores, clinical progress updates, and shift handover sign-offs in real time.",
+          "<strong>Modular MERN Architecture:</strong> Built with decoupled Express.js REST APIs, MongoDB Mongoose schema validation, and responsive React interfaces."
+        ],
+        techStack: ["React", "Node.js", "Express.js", "MongoDB", "Mongoose", "JWT", "Helmet", "Joi", "Morgan"],
+        links: {
+          github: "https://github.com/mariamgameel"
+        }
+      }
+    };
+
+    function openProjectModal(key) {
+      const data = projectDetails[key];
+      if (!data) return;
+
+      const modal = document.getElementById('project-modal');
+      const content = document.getElementById('modal-content');
+
+      content.innerHTML = `
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-burgundy/10 text-burgundy text-xs font-semibold">
+          ${data.badge}
+        </div>
+        <h2 class="font-serif text-3xl font-bold text-espresso">${data.title}</h2>
+        <p class="text-sm text-espresso.soft leading-relaxed">${data.overview}</p>
+        
+        <div class="my-4 bg-alabaster.warm/30 rounded-2xl p-4 border border-alabaster-border/60">
+          <h4 class="text-xs font-bold text-espresso uppercase tracking-wider mb-2">Key Engineering Accomplishments:</h4>
+          <ul class="space-y-2 text-xs text-espresso.soft">
+            ${data.highlights.map(h => `<li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-burgundy shrink-0 mt-0.5"></i><span>${h}</span></li>`).join('')}
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-bold text-espresso uppercase tracking-wider mb-2">Technology Architecture:</h4>
+          <div class="flex flex-wrap gap-1.5">
+            ${data.techStack.map(t => `<span class="px-2.5 py-1 rounded-lg bg-burgundy text-alabaster font-mono text-xs">${t}</span>`).join('')}
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-alabaster-border flex items-center justify-between">
+          <a href="${data.links.github}" target="_blank" class="inline-flex items-center gap-2 bg-burgundy text-alabaster font-semibold text-xs px-4 py-2 rounded-xl hover:bg-burgundy-light transition-all">
+            <i data-lucide="github" class="w-4 h-4"></i>
+            <span>View Source on GitHub</span>
+          </a>
+          <button onclick="closeProjectModal()" class="text-xs font-medium text-espresso.mocha hover:text-espresso">
+            Close
+          </button>
+        </div>
+      `;
+
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeProjectModal() {
+      document.getElementById('project-modal').classList.add('hidden');
+    }
+
+    // Pillar info modal
+    function openPillarModal(pillar) {
+      if (pillar === 'fullstack') {
+        openProjectModal('hrms');
+      } else if (pillar === 'ai') {
+        openProjectModal('hrms');
+      } else if (pillar === 'psychology') {
+        openProjectModal('pediatric');
+      }
+    }
+
+    // Close on Escape or click outside
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeProjectModal();
+    });
+    document.getElementById('project-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'project-modal') closeProjectModal();
+    });
+  </script>
+</body>
+</html>
