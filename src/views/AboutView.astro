@@ -1,0 +1,241 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { technicalStack, languagesSpoken } from '../data/site';
+import { getLocalizedPath, useTranslations, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const allExperience = await getCollection('experience');
+const sortedExperience = allExperience.sort((a, b) => a.data.order - b.data.order);
+
+const stackCategories = [
+  { id: 'languages', title: 'Languages', icon: 'code' },
+  { id: 'frontend', title: 'Frontend Architecture', icon: 'layout' },
+  { id: 'backend', title: 'Backend & Databases', icon: 'server' },
+  { id: 'cloud_security', title: 'AI, Cloud, DevOps & Security', icon: 'shield-check' }
+];
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${t('about.title')} | Mariam Gameel`}
+  description={t('about.subtitle')}
+>
+  <div class="space-y-12 pt-4 pb-16 max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="space-y-2">
+      <div class="inline-flex items-center gap-2 text-xs font-mono text-text-muted uppercase">
+        <span>Engineering Background</span>
+        <span>•</span>
+        <span>Systems & Human Factors</span>
+      </div>
+
+      <h1 class="font-serif text-4xl sm:text-5xl font-bold text-text-primary">
+        {t('about.title')}
+      </h1>
+
+      <p class="text-sm sm:text-base text-text-secondary leading-relaxed">
+        {t('about.subtitle')}
+      </p>
+    </div>
+
+    <!-- Psychology + Engineering Core Narrative (Concrete Examples) -->
+    <section class="bento-card rounded-3xl p-7 sm:p-9 border border-border space-y-5">
+      <div class="inline-flex items-center gap-2 text-xs font-mono font-semibold text-text-primary uppercase tracking-wider">
+        <Icon name="brain" class="w-4 h-4" />
+        <span>{t('about.storyTitle')}</span>
+      </div>
+
+      <h2 class="font-serif text-2xl sm:text-3xl font-bold text-text-primary">
+        Why Behavioral Science Makes Better Software
+      </h2>
+
+      <div class="space-y-4 text-xs sm:text-sm text-text-secondary leading-relaxed">
+        <p>
+          Most software defects do not originate from compiler errors; they stem from misunderstandings of human cognitive limitations. My academic training in Psychology (B.Ed., Suez Canal University) provides a scientific foundation for understanding attention spans, memory limits, and cognitive fatigue under stress.
+        </p>
+
+        <p>
+          In practice, this translates directly into concrete engineering choices:
+        </p>
+
+        <ul class="space-y-3 pt-1">
+          <li class="flex items-start gap-3 bg-mist/20 dark:bg-charcoal/40 p-3.5 rounded-xl border border-border/60">
+            <Icon name="shield-alert" class="w-4 h-4 text-text-primary shrink-0 mt-0.5" />
+            <div>
+              <strong class="text-text-primary block font-semibold mb-0.5">Defensive API & Input Contracts:</strong>
+              In the Pediatric Handover clinical system, recognizing that clinicians experience severe fatigue during 12-hour shifts led me to enforce strict, early schema validation (Joi) and idempotent API endpoints, preventing ambiguous medical data entry before it reaches persistence.
+            </div>
+          </li>
+
+          <li class="flex items-start gap-3 bg-mist/20 dark:bg-charcoal/40 p-3.5 rounded-xl border border-border/60">
+            <Icon name="git-pull-request" class="w-4 h-4 text-text-primary shrink-0 mt-0.5" />
+            <div>
+              <strong class="text-text-primary block font-semibold mb-0.5">Mental Model Alignment in Workflows:</strong>
+              When building the ACUD HRMS interview engine, I structured candidate evaluation rubrics around the interviewer's natural decision-making hierarchy rather than the database schema, cutting administrative friction and preventing dropped evaluations.
+            </div>
+          </li>
+
+          <li class="flex items-start gap-3 bg-mist/20 dark:bg-charcoal/40 p-3.5 rounded-xl border border-border/60">
+            <Icon name="lock" class="w-4 h-4 text-text-primary shrink-0 mt-0.5" />
+            <div>
+              <strong class="text-text-primary block font-semibold mb-0.5">Privacy-First AI Architecture:</strong>
+              Understanding corporate trust dynamics and confidentiality anxiety motivated the architectural choice to run Ollama LLMs strictly on-premises, eliminating employee reluctance to query sensitive organizational policies.
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Experience Timeline -->
+    <section class="space-y-6">
+      <h2 class="font-serif text-2xl sm:text-3xl font-bold text-text-primary">
+        {t('about.experienceTitle')}
+      </h2>
+
+      <div class="space-y-4">
+        {sortedExperience.map((exp) => {
+          const role = lang === 'ar' && exp.data.role_ar ? exp.data.role_ar : exp.data.role;
+          const org = lang === 'ar' && exp.data.org_ar ? exp.data.org_ar : exp.data.org;
+          const summary = lang === 'ar' && exp.data.summary_ar ? exp.data.summary_ar : exp.data.summary;
+
+          return (
+            <div class="bento-card rounded-2xl p-6 border border-border flex flex-col sm:flex-row items-start justify-between gap-4">
+              <div class="space-y-2 flex-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="font-bold text-base text-text-primary">{role}</h3>
+                  <span class="text-xs text-text-muted">•</span>
+                  <span class="text-xs font-medium text-text-secondary">{org}</span>
+                </div>
+                <p class="text-xs sm:text-sm text-text-secondary leading-relaxed">
+                  {summary}
+                </p>
+                <div class="flex flex-wrap gap-1.5 pt-2">
+                  {exp.data.tech.map((tech) => (
+                    <span class="px-2 py-0.5 rounded bg-mist/40 dark:bg-charcoal text-text-muted font-mono text-[10px]">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div class="text-xs font-mono text-text-muted shrink-0 bg-mist/30 dark:bg-charcoal/60 px-3 py-1 rounded-full border border-border">
+                {exp.data.start} {exp.data.end ? `— ${exp.data.end}` : '— Present'}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+
+    <!-- Honors & Leadership Recognition (Text-only per instructions, no big image) -->
+    <section class="bento-card rounded-2xl p-6 sm:p-7 border border-border space-y-2.5">
+      <div class="flex items-center gap-2 text-xs font-mono font-semibold text-text-primary uppercase tracking-wider">
+        <Icon name="award" class="w-4 h-4" />
+        <span>{t('about.recognitionTitle')}</span>
+      </div>
+      <p class="text-xs sm:text-sm text-text-secondary leading-relaxed">
+        {t('about.recognitionText')}
+      </p>
+      <div class="pt-1">
+        <a
+          href={getLocalizedPath('/gallery', lang)}
+          class="inline-flex items-center gap-1.5 text-xs font-semibold text-text-primary hover:underline"
+        >
+          <span>{t('about.seeGalleryLink')}</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Education & Specialized Training -->
+    <section class="space-y-6">
+      <h2 class="font-serif text-2xl sm:text-3xl font-bold text-text-primary">
+        {t('about.educationTitle')}
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bento-card rounded-2xl p-6 border border-border space-y-2">
+          <div class="flex items-center justify-between text-xs font-mono text-text-muted">
+            <span>Specialized Diploma</span>
+            <span>2025 – 2026</span>
+          </div>
+          <h3 class="font-serif font-bold text-lg text-text-primary">
+            Digilians Specialized Diploma in AI-Based Software Development
+          </h3>
+          <p class="text-xs text-text-secondary leading-relaxed">
+            Rigorous curriculum spanning full-stack web architectures, enterprise database management, cloud microservices, and practical local AI model integrations.
+          </p>
+        </div>
+
+        <div class="bento-card rounded-2xl p-6 border border-border space-y-2">
+          <div class="flex items-center justify-between text-xs font-mono text-text-muted">
+            <span>Bachelor of Education (B.Ed.)</span>
+            <span>2019 – 2023</span>
+          </div>
+          <h3 class="font-serif font-bold text-lg text-text-primary">
+            Psychology Department — Suez Canal University
+          </h3>
+          <p class="text-xs text-text-secondary leading-relaxed">
+            Rigorous study in human cognition, behavioral statistics, analytical thinking, research methodologies, and human-computer psychological dynamics.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Technical Stack Matrix -->
+    <section id="stack" class="space-y-6">
+      <h2 class="font-serif text-2xl sm:text-3xl font-bold text-text-primary">
+        {t('about.stackTitle')}
+      </h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+        {stackCategories.map((cat) => {
+          const items = technicalStack.filter((t) => t.category === cat.id);
+          return (
+            <div class="bento-card rounded-2xl p-5 border border-border space-y-3">
+              <div class="flex items-center gap-2 font-serif font-bold text-base text-text-primary">
+                <Icon name={cat.icon} class="w-4 h-4 text-text-secondary" />
+                <span>{cat.title}</span>
+              </div>
+              <ul class="space-y-1.5 text-text-secondary">
+                {items.map((item) => (
+                  <li class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-text-primary"></span>
+                    <span>{item.name}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+
+    <!-- Spoken Languages -->
+    <section class="space-y-4">
+      <h2 class="font-serif text-2xl font-bold text-text-primary">
+        {t('about.languagesTitle')}
+      </h2>
+
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
+        {languagesSpoken.map((langItem) => (
+          <div class="bento-card rounded-xl p-3.5 border border-border text-center space-y-0.5">
+            <div class="font-bold text-text-primary text-sm">
+              {lang === 'ar' ? langItem.name_ar : langItem.name}
+            </div>
+            <div class="text-[11px] text-text-muted">
+              {lang === 'ar' ? langItem.level_ar : langItem.level}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  </div>
+</BaseLayout>

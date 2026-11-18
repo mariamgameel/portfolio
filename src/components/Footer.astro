@@ -1,0 +1,61 @@
+---
+import Icon from './Icon.astro';
+import { siteConfig } from '../data/site';
+import { useTranslations, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<footer class="mt-20 border-t border-border pt-12 pb-16 text-text-secondary text-xs">
+  <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-6">
+    <!-- Brand / Identity -->
+    <div class="flex flex-col items-center sm:items-start gap-1">
+      <span class="font-serif font-bold text-sm text-text-primary tracking-wide">
+        {lang === 'ar' ? siteConfig.name_ar : siteConfig.name}
+      </span>
+      <p class="text-[11px] text-text-muted">
+        © {new Date().getFullYear()} {siteConfig.name}. {t('footer.rights')}
+      </p>
+    </div>
+
+    <!-- Social Links -->
+    <div class="flex items-center gap-4 text-xs font-medium">
+      <a
+        href={siteConfig.github}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex items-center gap-1.5 hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-silver rounded"
+      >
+        <Icon name="github" class="w-4 h-4" />
+        <span>GitHub</span>
+      </a>
+
+      <a
+        href={siteConfig.linkedin}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex items-center gap-1.5 hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-silver rounded"
+      >
+        <Icon name="linkedin" class="w-4 h-4" />
+        <span>LinkedIn</span>
+      </a>
+
+      <a
+        href={`mailto:${siteConfig.email}`}
+        class="flex items-center gap-1.5 hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-silver rounded"
+      >
+        <Icon name="mail" class="w-4 h-4" />
+        <span>{siteConfig.email}</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 text-center mt-6 text-[10px] text-text-muted">
+    {t('footer.builtWith')}
+  </div>
+</footer>

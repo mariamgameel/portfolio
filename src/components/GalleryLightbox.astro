@@ -1,0 +1,175 @@
+---
+import Icon from './Icon.astro';
+import { useTranslations, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<dialog
+  id="gallery-lightbox-dialog"
+  class="fixed inset-0 z-[120] hidden bg-ink/85 backdrop-blur-md p-4 w-full h-full max-w-full max-h-full flex-col items-center justify-center m-0 border-0"
+  aria-modal="true"
+  aria-label="Image Preview Lightbox"
+>
+  <div class="relative max-w-4xl max-h-[90vh] w-full flex flex-col items-center justify-center">
+    <!-- Close Button -->
+    <button
+      id="lightbox-close-btn"
+      type="button"
+      class="absolute -top-12 right-0 p-2.5 rounded-full bg-charcoal/60 hover:bg-charcoal text-marble-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-silver"
+      aria-label={t('gallery.close')}
+    >
+      <Icon name="x" class="w-6 h-6" />
+    </button>
+
+    <!-- Navigation Previous -->
+    <button
+      id="lightbox-prev-btn"
+      type="button"
+      class="absolute left-2 top-1/2 -translate-y-1/2 p-3 rounded-full bg-charcoal/70 hover:bg-charcoal text-marble-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-silver hidden sm:flex items-center justify-center shadow-lg"
+      aria-label={t('gallery.prev')}
+    >
+      <Icon name="chevron-left" class="w-6 h-6" />
+    </button>
+
+    <!-- Navigation Next -->
+    <button
+      id="lightbox-next-btn"
+      type="button"
+      class="absolute right-2 top-1/2 -translate-y-1/2 p-3 rounded-full bg-charcoal/70 hover:bg-charcoal text-marble-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-silver hidden sm:flex items-center justify-center shadow-lg"
+      aria-label={t('gallery.next')}
+    >
+      <Icon name="chevron-right" class="w-6 h-6" />
+    </button>
+
+    <!-- Image Display -->
+    <div class="max-w-full max-h-[75vh] flex items-center justify-center overflow-hidden rounded-2xl border border-silver/30 shadow-2xl bg-charcoal">
+      <img
+        id="lightbox-image"
+        src=""
+        alt=""
+        class="max-w-full max-h-[75vh] object-contain"
+      />
+    </div>
+
+    <!-- Caption -->
+    <div class="mt-4 text-center px-4 max-w-2xl">
+      <h4 id="lightbox-title" class="font-serif text-lg font-bold text-marble-white"></h4>
+      <p id="lightbox-caption-text" class="text-xs text-silver mt-1 leading-relaxed"></p>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  interface GalleryItemData {
+    src: string;
+    title: string;
+    caption: string;
+    alt: string;
+  }
+
+  let items: GalleryItemData[] = [];
+  let currentIndex = 0;
+
+  const dialog = document.getElementById('gallery-lightbox-dialog') as HTMLDialogElement | null;
+  const imgEl = document.getElementById('lightbox-image') as HTMLImageElement | null;
+  const titleEl = document.getElementById('lightbox-title');
+  const captionEl = document.getElementById('lightbox-caption-text');
+  const closeBtn = document.getElementById('lightbox-close-btn');
+  const prevBtn = document.getElementById('lightbox-prev-btn');
+  const nextBtn = document.getElementById('lightbox-next-btn');
+
+  let lastActiveElement: HTMLElement | null = null;
+
+  function updateLightboxView() {
+    if (!items.length || !imgEl) return;
+    const item = items[currentIndex];
+    imgEl.src = item.src;
+    imgEl.alt = item.alt || item.title;
+    if (titleEl) titleEl.textContent = item.title;
+    if (captionEl) captionEl.textContent = item.caption;
+  }
+
+  function openLightbox(index: number) {
+    if (!dialog || !items.length) return;
+    lastActiveElement = document.activeElement as HTMLElement;
+    currentIndex = index;
+    updateLightboxView();
+    dialog.classList.remove('hidden');
+    dialog.classList.add('flex');
+    closeBtn?.focus();
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    if (!dialog) return;
+    dialog.classList.remove('flex');
+    dialog.classList.add('hidden');
+    document.body.style.overflow = '';
+    if (lastActiveElement) lastActiveElement.focus();
+  }
+
+  function nextImage() {
+    currentIndex = (currentIndex + 1) % items.length;
+    updateLightboxView();
+  }
+
+  function prevImage() {
+    currentIndex = (currentIndex - 1 + items.length) % items.length;
+    updateLightboxView();
+  }
+
+  // Initialize triggers across page
+  function setupLightboxTriggers() {
+    items = [];
+    const triggerElements = document.querySelectorAll<HTMLElement>('[data-lightbox-src]');
+
+    triggerElements.forEach((el, index) => {
+      const src = el.getAttribute('data-lightbox-src') || '';
+      const title = el.getAttribute('data-lightbox-title') || el.getAttribute('data-lightbox-caption') || '';
+      const caption = el.getAttribute('data-lightbox-caption') || '';
+      const alt = el.getAttribute('data-lightbox-alt') || title;
+
+      items.push({ src, title, caption, alt });
+
+      el.addEventListener('click', () => openLightbox(index));
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openLightbox(index);
+        }
+      });
+    });
+  }
+
+  setupLightboxTriggers();
+
+  closeBtn?.addEventListener('click', closeLightbox);
+  nextBtn?.addEventListener('click', nextImage);
+  prevBtn?.addEventListener('click', prevImage);
+
+  // Keyboard navigation & accessibility focus trap
+  window.addEventListener('keydown', (e) => {
+    if (!dialog || dialog.classList.contains('hidden')) return;
+
+    if (e.key === 'Escape') {
+      closeLightbox();
+    } else if (e.key === 'ArrowRight') {
+      nextImage();
+    } else if (e.key === 'ArrowLeft') {
+      prevImage();
+    }
+  });
+
+  // Click outside image closes lightbox
+  dialog?.addEventListener('click', (e) => {
+    if (e.target === dialog) {
+      closeLightbox();
+    }
+  });
+</script>

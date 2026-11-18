@@ -1,0 +1,122 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { useTranslations, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const allProjects = await getCollection('projects', ({ data }) => !data.draft);
+const sortedProjects = allProjects.sort((a, b) => {
+  if (a.data.order !== b.data.order) {
+    return a.data.order - b.data.order;
+  }
+  return new Date(b.data.date).getTime() - new Date(a.data.date).getTime();
+});
+
+const categories = [
+  { id: 'all', label: t('projects.filterAll') },
+  { id: 'fullstack', label: 'Full-Stack' },
+  { id: 'ai', label: 'AI & Local LLM' },
+  { id: 'healthcare', label: 'Healthcare' },
+  { id: 'devops', label: 'DevOps & Cloud' },
+  { id: 'frontend', label: 'Frontend' }
+];
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${t('projects.title')} | Mariam Gameel`}
+  description={t('projects.subtitle')}
+>
+  <div class="space-y-8 pt-4 pb-16">
+    <!-- Header -->
+    <div class="space-y-2">
+      <div class="inline-flex items-center gap-2 text-xs font-mono text-text-muted uppercase">
+        <span>Portfolio Archive</span>
+        <span>•</span>
+        <span>{sortedProjects.length} Projects</span>
+      </div>
+
+      <h1 class="font-serif text-4xl sm:text-5xl font-bold text-text-primary">
+        {t('projects.title')}
+      </h1>
+
+      <p class="text-sm sm:text-base text-text-secondary max-w-2xl leading-relaxed">
+        {t('projects.subtitle')}
+      </p>
+    </div>
+
+    <!-- Filter Buttons Bar -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-2 border-b border-border text-xs">
+      {categories.map((cat, index) => (
+        <button
+          type="button"
+          class={`filter-category-btn px-4 py-1.5 rounded-full font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-silver shrink-0 ${
+            index === 0
+              ? 'active-filter bg-ink text-marble-white dark:bg-white dark:text-ink font-semibold'
+              : 'bg-mist/30 dark:bg-charcoal text-text-secondary hover:text-text-primary border border-border'
+          }`}
+          data-filter={cat.id}
+        >
+          {cat.label}
+        </button>
+      ))}
+    </div>
+
+    <!-- Project Grid -->
+    <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {sortedProjects.map((project) => (
+        <div class="project-item" data-categories={project.data.category.join(' ')}>
+          <ProjectCard project={project} lang={lang} />
+        </div>
+      ))}
+    </div>
+
+    <!-- Empty State -->
+    <div id="projects-empty" class="hidden text-center py-16 text-text-muted text-sm">
+      {t('projects.empty')}
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const filterBtns = document.querySelectorAll('.filter-category-btn');
+  const projectItems = document.querySelectorAll<HTMLElement>('.project-item');
+  const emptyState = document.getElementById('projects-empty');
+
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const filter = btn.getAttribute('data-filter') || 'all';
+
+      // Update button visual styles
+      filterBtns.forEach((b) => {
+        b.classList.remove('active-filter', 'bg-ink', 'text-marble-white', 'dark:bg-white', 'dark:text-ink', 'font-semibold');
+        b.classList.add('bg-mist/30', 'dark:bg-charcoal', 'text-text-secondary', 'border', 'border-border');
+      });
+
+      btn.classList.add('active-filter', 'bg-ink', 'text-marble-white', 'dark:bg-white', 'dark:text-ink', 'font-semibold');
+      btn.classList.remove('bg-mist/30', 'dark:bg-charcoal', 'text-text-secondary', 'border');
+
+      let visibleCount = 0;
+      projectItems.forEach((item) => {
+        const itemCategories = item.getAttribute('data-categories')?.split(' ') || [];
+        if (filter === 'all' || itemCategories.includes(filter)) {
+          item.style.display = 'block';
+          visibleCount++;
+        } else {
+          item.style.display = 'none';
+        }
+      });
+
+      if (emptyState) {
+        emptyState.classList.toggle('hidden', visibleCount > 0);
+      }
+    });
+  });
+</script>

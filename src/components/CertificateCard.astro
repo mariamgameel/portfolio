@@ -1,0 +1,155 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import { useTranslations, type Lang } from '../i18n/utils';
+
+interface Props {
+  cert: CollectionEntry<'certificates'>;
+  lang: Lang;
+}
+
+const { cert, lang } = Astro.props;
+const t = useTranslations(lang);
+const { data } = cert;
+
+const title = lang === 'ar' && data.title_ar ? data.title_ar : data.title;
+
+// Compute status from dates
+let isExpired = false;
+if (data.expiryDate) {
+  const expiry = new Date(data.expiryDate);
+  const now = new Date();
+  isExpired = expiry < now;
+}
+---
+
+<article class="bento-card rounded-2xl p-6 sm:p-7 flex flex-col justify-between group relative overflow-hidden transition-all duration-300 hover:shadow-marble-md">
+  <div>
+    <!-- Top Metadata: Issuer & Status Badge -->
+    <div class="flex items-center justify-between gap-2 mb-3.5">
+      <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-mist/50 dark:bg-charcoal text-text-secondary border border-border">
+        {data.level}
+      </span>
+
+      <span class={`text-[11px] font-mono flex items-center gap-1.5 font-semibold ${isExpired ? 'text-status-error' : 'text-status-success'}`}>
+        <span class={`w-2 h-2 rounded-full ${isExpired ? 'bg-status-error' : 'bg-status-success'}`}></span>
+        <span>{isExpired ? t('certificates.expired') : t('certificates.active')}</span>
+      </span>
+    </div>
+
+    <!-- Badge Image Preview (if available) -->
+    {data.badge && (
+      <div
+        class="bg-charcoal/5 dark:bg-charcoal/50 rounded-xl p-3 mb-4 cursor-pointer group/badge relative overflow-hidden border border-border"
+        data-lightbox-src={data.badge}
+        data-lightbox-caption={`${title} — ${data.issuer}`}
+        tabindex="0"
+        role="button"
+        aria-label={`Inspect ${title} credential badge`}
+      >
+        <img
+          src={data.badge}
+          alt={`${title} verification badge`}
+          class="w-full h-36 object-contain rounded group-hover/badge:scale-105 transition-transform duration-300"
+          loading="lazy"
+          width="400"
+          height="144"
+        />
+        <div class="absolute inset-0 bg-ink/40 opacity-0 group-hover/badge:opacity-100 transition-opacity flex items-center justify-center text-marble-white text-xs font-medium gap-1.5">
+          <Icon name="zoom-in" class="w-4 h-4" />
+          <span>Click to Inspect</span>
+        </div>
+      </div>
+    )}
+
+    <!-- Title & Issuer -->
+    <h3 class="font-serif text-2xl font-bold text-text-primary">
+      {title}
+    </h3>
+    <p class="text-xs font-medium text-text-muted mt-1">
+      {data.issuer} • {data.category}
+    </p>
+
+    <!-- Dates & Validation Details -->
+    <div class="mt-4 space-y-1.5 text-xs text-text-secondary font-mono bg-mist/20 dark:bg-charcoal/40 rounded-xl p-3 border border-border/60">
+      {data.validationId && (
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-text-muted">{t('certificates.validationId')}:</span>
+          <span class="font-semibold text-text-primary text-[10px] truncate max-w-[160px]" title={data.validationId}>
+            {data.validationId}
+          </span>
+        </div>
+      )}
+      <div class="flex items-center justify-between">
+        <span class="text-text-muted">{t('certificates.issued')}:</span>
+        <span class="text-text-primary font-semibold">{data.issueDate}</span>
+      </div>
+      {data.expiryDate && (
+        <div class="flex items-center justify-between">
+          <span class="text-text-muted">{t('certificates.expires')}:</span>
+          <span class="text-text-primary font-semibold">{data.expiryDate}</span>
+        </div>
+      )}
+    </div>
+  </div>
+
+  <!-- Action Links -->
+  <div class="pt-4 mt-4 border-t border-border flex items-center justify-between gap-3 text-xs flex-wrap">
+    {data.validationId ? (
+      <button
+        type="button"
+        class="copy-id-btn text-text-muted hover:text-text-primary font-medium flex items-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-silver rounded py-1"
+        data-id={data.validationId}
+      >
+        <Icon name="copy" class="w-3.5 h-3.5" />
+        <span>{t('certificates.copyId')}</span>
+      </button>
+    ) : (
+      <span></span>
+    )}
+
+    <div class="flex items-center gap-2">
+      {data.pdf && (
+        <a
+          href={data.pdf}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-border text-text-secondary hover:text-text-primary hover:bg-mist/30 dark:hover:bg-charcoal/60 transition-colors"
+        >
+          <Icon name="file-text" class="w-3.5 h-3.5" />
+          <span>PDF</span>
+        </a>
+      )}
+
+      {data.verifyUrl && (
+        <a
+          href={data.verifyUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-ink text-marble-white dark:bg-white dark:text-ink font-semibold hover:opacity-90 transition-opacity"
+        >
+          <span>{t('certificates.verify')}</span>
+          <Icon name="arrow-up-right" class="w-3.5 h-3.5" />
+        </a>
+      )}
+    </div>
+  </div>
+</article>
+
+<script>
+  // Copy validation ID handlers
+  document.querySelectorAll('.copy-id-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-id');
+      if (id) {
+        navigator.clipboard.writeText(id).then(() => {
+          const original = btn.innerHTML;
+          btn.innerHTML = `<span class="text-status-success font-semibold">Copied!</span>`;
+          setTimeout(() => {
+            btn.innerHTML = original;
+          }, 2000);
+        });
+      }
+    });
+  });
+</script>

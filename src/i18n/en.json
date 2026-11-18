@@ -1,0 +1,109 @@
+{
+  "nav": {
+    "home": "Home",
+    "projects": "Projects",
+    "certificates": "Certificates",
+    "gallery": "Gallery",
+    "about": "About",
+    "contact": "Contact",
+    "resume": "Resume",
+    "openForRoles": "Open for Roles",
+    "themeToggle": "Toggle theme",
+    "langToggle": "العربية"
+  },
+  "hero": {
+    "badge": "Full-Stack Software Engineer • AI Integration",
+    "title": "Engineering Scalable, Human-Centered Software.",
+    "tagline": "Bridging an academic foundation in Psychology with scalable full-stack engineering. Experienced in building responsive React applications, secure RESTful APIs in Laravel 12 & Node.js, and private local AI systems via Ollama.",
+    "viewProjects": "View Projects",
+    "downloadCv": "Download CV",
+    "contactMe": "Get in Touch",
+    "terminalTitle": "Terminal — mariam@engineer",
+    "seeGallery": "See full gallery & recognition"
+  },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "Production systems, enterprise workflows, and full-stack software applications.",
+    "featuredTitle": "Featured Projects",
+    "viewAll": "View all projects",
+    "filterAll": "All",
+    "inspect": "View Case Study",
+    "problem": "The Challenge",
+    "solution": "The Architecture & Solution",
+    "results": "Outcomes & Results",
+    "highlights": "Technical Highlights",
+    "tech": "Technologies",
+    "role": "Role",
+    "date": "Timeline",
+    "status": "Deployment Status",
+    "liveDemo": "Live Application",
+    "sourceCode": "Source Code",
+    "prev": "Previous Project",
+    "next": "Next Project",
+    "empty": "No projects found matching the selected filter."
+  },
+  "certificates": {
+    "title": "Certifications & Credentials",
+    "subtitle": "Verified cloud certifications, frontend credentials, and continuous learning badges.",
+    "filterAll": "All Issuers",
+    "active": "Active Credential",
+    "expired": "Expired",
+    "validationId": "Validation ID",
+    "copyId": "Copy ID",
+    "copied": "Copied to clipboard!",
+    "verify": "Verify Credential",
+    "viewPdf": "View Certificate PDF",
+    "issued": "Issued",
+    "expires": "Expires",
+    "latestTitle": "Verified Cloud Credentials",
+    "viewAll": "View all certificates"
+  },
+  "gallery": {
+    "title": "Gallery & Recognition",
+    "subtitle": "Documented engineering milestones, leadership awards, and credential badges.",
+    "filterAll": "All",
+    "filterRecognition": "Recognition",
+    "filterPortrait": "Portrait",
+    "filterCertificates": "Certificates",
+    "filterProjects": "Projects",
+    "filterEvents": "Events",
+    "close": "Close preview (Esc)",
+    "prev": "Previous image (←)",
+    "next": "Next image (→)"
+  },
+  "about": {
+    "title": "About & Engineering Philosophy",
+    "subtitle": "The intersection of human cognition, systems architecture, and robust software craftsmanship.",
+    "storyTitle": "Psychology Meets Software Engineering",
+    "educationTitle": "Education & Specialized Training",
+    "experienceTitle": "Professional Experience",
+    "stackTitle": "Technical Stack Matrix",
+    "languagesTitle": "Spoken Languages",
+    "recognitionTitle": "Honors & Leadership Recognition",
+    "recognitionText": "Honored by the leadership of the Administrative Capital for Urban Development (ACUD) for engineering contributions to the AI-Powered Human Resources Management System.",
+    "seeGalleryLink": "View award presentation in gallery →"
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "subtitle": "Open to junior software engineer and full-stack developer opportunities. Let's build something exceptional together.",
+    "nameLabel": "Your Name",
+    "emailLabel": "Your Email",
+    "subjectLabel": "Subject",
+    "messageLabel": "Message",
+    "send": "Send Message",
+    "sending": "Sending...",
+    "success": "Thank you! Your message has been sent successfully.",
+    "error": "Oops! There was an error sending your message. Please reach out directly via email.",
+    "copyEmail": "Copy Email Address",
+    "scheduleCall": "Schedule an Interview"
+  },
+  "notFound": {
+    "title": "404 — Page Not Found",
+    "description": "The page you are looking for does not exist or has been moved.",
+    "homeLink": "Return to Home"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "builtWith": "Designed with monochrome marble precision • Powered by Astro & TypeScript"
+  }
+}

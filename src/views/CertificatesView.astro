@@ -1,0 +1,110 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CertificateCard from '../components/CertificateCard.astro';
+import GalleryLightbox from '../components/GalleryLightbox.astro';
+import { useTranslations, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const allCertificates = await getCollection('certificates', ({ data }) => !data.draft);
+const sortedCertificates = allCertificates.sort((a, b) => a.data.order - b.data.order);
+
+// Computed stats
+const activeCerts = sortedCertificates.filter((c) => {
+  if (!c.data.expiryDate) return true;
+  return new Date(c.data.expiryDate) >= new Date();
+});
+
+// Issuers for filter
+const issuers = ['all', 'AWS', 'Meta', 'Packt', 'IBM'];
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${t('certificates.title')} | Mariam Gameel`}
+  description={t('certificates.subtitle')}
+>
+  <div class="space-y-8 pt-4 pb-16">
+    <!-- Header -->
+    <div class="space-y-2">
+      <div class="inline-flex items-center gap-2 text-xs font-mono text-text-muted uppercase">
+        <span>Verified Credentials</span>
+        <span>•</span>
+        <span>{sortedCertificates.length} Total</span>
+        <span>•</span>
+        <span class="text-status-success">{activeCerts.length} Active</span>
+      </div>
+
+      <h1 class="font-serif text-4xl sm:text-5xl font-bold text-text-primary">
+        {t('certificates.title')}
+      </h1>
+
+      <p class="text-sm sm:text-base text-text-secondary max-w-2xl leading-relaxed">
+        {t('certificates.subtitle')}
+      </p>
+    </div>
+
+    <!-- Filter Buttons Bar -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-2 border-b border-border text-xs">
+      {issuers.map((issuer, idx) => (
+        <button
+          type="button"
+          class={`filter-cert-btn px-4 py-1.5 rounded-full font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-silver shrink-0 ${
+            idx === 0
+              ? 'active-filter bg-ink text-marble-white dark:bg-white dark:text-ink font-semibold'
+              : 'bg-mist/30 dark:bg-charcoal text-text-secondary hover:text-text-primary border border-border'
+          }`}
+          data-issuer={issuer}
+        >
+          {issuer === 'all' ? t('certificates.filterAll') : issuer}
+        </button>
+      ))}
+    </div>
+
+    <!-- Certificate Cards Grid -->
+    <div id="certs-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {sortedCertificates.map((cert) => (
+        <div class="cert-item" data-issuer={cert.data.issuer}>
+          <CertificateCard cert={cert} lang={lang} />
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Lightbox Modal for Badge Previews -->
+  <GalleryLightbox lang={lang} />
+</BaseLayout>
+
+<script>
+  const certBtns = document.querySelectorAll('.filter-cert-btn');
+  const certItems = document.querySelectorAll<HTMLElement>('.cert-item');
+
+  certBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const issuer = btn.getAttribute('data-issuer') || 'all';
+
+      certBtns.forEach((b) => {
+        b.classList.remove('active-filter', 'bg-ink', 'text-marble-white', 'dark:bg-white', 'dark:text-ink', 'font-semibold');
+        b.classList.add('bg-mist/30', 'dark:bg-charcoal', 'text-text-secondary', 'border', 'border-border');
+      });
+
+      btn.classList.add('active-filter', 'bg-ink', 'text-marble-white', 'dark:bg-white', 'dark:text-ink', 'font-semibold');
+      btn.classList.remove('bg-mist/30', 'dark:bg-charcoal', 'text-text-secondary', 'border');
+
+      certItems.forEach((item) => {
+        const itemIssuer = item.getAttribute('data-issuer') || '';
+        if (issuer === 'all' || itemIssuer.toLowerCase().includes(issuer.toLowerCase())) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>

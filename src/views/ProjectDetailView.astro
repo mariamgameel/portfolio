@@ -1,0 +1,241 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { getLocalizedPath, useTranslations, type Lang } from '../i18n/utils';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  prevProject?: CollectionEntry<'projects'>;
+  nextProject?: CollectionEntry<'projects'>;
+  lang: Lang;
+}
+
+const { project, prevProject, nextProject, lang } = Astro.props;
+const t = useTranslations(lang);
+const { data } = project;
+
+const title = lang === 'ar' && data.title_ar ? data.title_ar : data.title;
+const summary = lang === 'ar' && data.summary_ar ? data.summary_ar : data.summary;
+
+const { Content } = await project.render();
+
+// JSON-LD schema for software case studies
+const projectSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareSourceCode',
+  name: data.title,
+  description: data.summary,
+  programmingLanguage: data.tech,
+  author: {
+    '@type': 'Person',
+    name: 'Mariam Gameel Ibrahim'
+  },
+  codeRepository: data.links?.repo || undefined
+};
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${title} — Case Study | Mariam Gameel`}
+  description={summary}
+  type="article"
+  jsonLd={projectSchema}
+>
+  <article class="space-y-10 pt-4 pb-16 max-w-4xl mx-auto">
+    <!-- Back to Projects link -->
+    <div>
+      <a
+        href={getLocalizedPath('/projects', lang)}
+        class="inline-flex items-center gap-1.5 text-xs font-semibold text-text-secondary hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-silver rounded"
+      >
+        <Icon name={lang === 'ar' ? 'arrow-right' : 'arrow-left'} class="w-3.5 h-3.5" />
+        <span>Back to all projects</span>
+      </a>
+    </div>
+
+    <!-- Case Study Header -->
+    <header class="space-y-4">
+      <div class="flex items-center gap-2 flex-wrap text-xs">
+        {data.category.map((cat) => (
+          <span class="px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wider bg-mist/40 dark:bg-charcoal text-text-secondary border border-border text-[10px]">
+            {cat}
+          </span>
+        ))}
+        <span class="text-text-muted">•</span>
+        <span class="font-mono text-text-muted">{data.date}</span>
+        <span class="text-text-muted">•</span>
+        <span class="px-2.5 py-0.5 rounded-full bg-status-success/10 text-status-success font-medium text-[11px] border border-status-success/20">
+          {data.status}
+        </span>
+      </div>
+
+      <h1 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-text-primary leading-[1.15]">
+        {title}
+      </h1>
+
+      <p class="text-base sm:text-lg text-text-secondary leading-relaxed">
+        {summary}
+      </p>
+
+      <!-- Action Links (Repo / Live Demo) -->
+      <div class="flex items-center gap-3 pt-2">
+        {data.links?.repo && (
+          <a
+            href={data.links.repo}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-ink text-marble-white dark:bg-white dark:text-ink font-semibold text-xs hover:opacity-90 transition-opacity shadow-sm"
+          >
+            <Icon name="github" class="w-4 h-4" />
+            <span>{t('projects.sourceCode')}</span>
+          </a>
+        )}
+
+        {data.links?.live && (
+          <a
+            href={data.links.live}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border hover:bg-mist/30 dark:hover:bg-charcoal/40 text-text-primary font-semibold text-xs transition-colors"
+          >
+            <Icon name="external-link" class="w-4 h-4" />
+            <span>{t('projects.liveDemo')}</span>
+          </a>
+        )}
+      </div>
+    </header>
+
+    <!-- Meta Grid (Role, Tech Stack, Status) -->
+    <div class="bento-card rounded-2xl p-6 border border-border grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs">
+      <div>
+        <div class="text-text-muted font-mono uppercase text-[10px] tracking-wider mb-1">
+          {t('projects.role')}
+        </div>
+        <div class="font-semibold text-text-primary text-sm">{data.role}</div>
+      </div>
+
+      <div>
+        <div class="text-text-muted font-mono uppercase text-[10px] tracking-wider mb-1">
+          {t('projects.tech')}
+        </div>
+        <div class="flex flex-wrap gap-1 mt-0.5">
+          {data.tech.map((item) => (
+            <span class="px-2 py-0.5 rounded bg-mist/40 dark:bg-charcoal text-text-secondary font-mono text-[10px]">
+              {item}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <div class="text-text-muted font-mono uppercase text-[10px] tracking-wider mb-1">
+          {t('projects.status')}
+        </div>
+        <div class="font-semibold text-text-primary text-sm">{data.status}</div>
+      </div>
+    </div>
+
+    <!-- Problem & Solution Split -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Problem -->
+      <section class="bento-card rounded-2xl p-6 sm:p-7 border border-border space-y-3">
+        <div class="inline-flex items-center gap-2 text-xs font-mono font-semibold text-status-error uppercase tracking-wider">
+          <Icon name="alert-circle" class="w-4 h-4" />
+          <span>{t('projects.problem')}</span>
+        </div>
+        <p class="text-xs sm:text-sm text-text-secondary leading-relaxed">
+          {data.problem}
+        </p>
+      </section>
+
+      <!-- Solution -->
+      <section class="bento-card rounded-2xl p-6 sm:p-7 border border-border space-y-3">
+        <div class="inline-flex items-center gap-2 text-xs font-mono font-semibold text-status-success uppercase tracking-wider">
+          <Icon name="check-circle" class="w-4 h-4" />
+          <span>{t('projects.solution')}</span>
+        </div>
+        <p class="text-xs sm:text-sm text-text-secondary leading-relaxed">
+          {data.solution}
+        </p>
+      </section>
+    </div>
+
+    <!-- Highlights & Key Features -->
+    {data.highlights.length > 0 && (
+      <section class="space-y-4">
+        <h3 class="font-serif text-2xl font-bold text-text-primary">
+          {t('projects.highlights')}
+        </h3>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {data.highlights.map((h) => (
+            <div class="bento-card rounded-2xl p-5 border border-border space-y-2">
+              <div class="w-8 h-8 rounded-lg bg-mist/50 dark:bg-charcoal flex items-center justify-center text-text-primary">
+                <Icon name={h.icon || 'code'} class="w-4 h-4" />
+              </div>
+              <h4 class="font-bold text-sm text-text-primary">{h.title}</h4>
+              <p class="text-xs text-text-secondary leading-relaxed">{h.text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- Outcomes & Results -->
+    {data.results.length > 0 && (
+      <section class="bento-card rounded-2xl p-6 sm:p-7 border border-border space-y-4">
+        <h3 class="font-serif text-2xl font-bold text-text-primary">
+          {t('projects.results')}
+        </h3>
+
+        <ul class="space-y-2.5 text-xs sm:text-sm text-text-secondary">
+          {data.results.map((res) => (
+            <li class="flex items-start gap-2.5">
+              <Icon name="check" class="w-4 h-4 text-status-success shrink-0 mt-0.5" />
+              <span>{res}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <!-- Detailed Markdown Body -->
+    <section class="prose dark:prose-invert max-w-none pt-4 border-t border-border prose-headings:font-serif prose-headings:tracking-tight prose-a:text-text-primary prose-pre:bg-charcoal prose-pre:text-marble-white prose-pre:border prose-pre:border-border">
+      <Content />
+    </section>
+
+    <!-- Prev / Next Navigation -->
+    <nav class="pt-8 border-t border-border flex items-center justify-between gap-4 text-xs font-semibold">
+      {prevProject ? (
+        <a
+          href={getLocalizedPath(`/projects/${prevProject.slug}`, lang)}
+          class="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors"
+        >
+          <Icon name={lang === 'ar' ? 'arrow-right' : 'arrow-left'} class="w-4 h-4" />
+          <div class="text-left">
+            <span class="block text-[10px] text-text-muted font-normal">{t('projects.prev')}</span>
+            <span class="truncate max-w-[180px] sm:max-w-xs block">{prevProject.data.title}</span>
+          </div>
+        </a>
+      ) : (
+        <div></div>
+      )}
+
+      {nextProject ? (
+        <a
+          href={getLocalizedPath(`/projects/${nextProject.slug}`, lang)}
+          class="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors text-right ml-auto"
+        >
+          <div class="text-right">
+            <span class="block text-[10px] text-text-muted font-normal">{t('projects.next')}</span>
+            <span class="truncate max-w-[180px] sm:max-w-xs block">{nextProject.data.title}</span>
+          </div>
+          <Icon name={lang === 'ar' ? 'arrow-left' : 'arrow-right'} class="w-4 h-4" />
+        </a>
+      ) : (
+        <div></div>
+      )}
+    </nav>
+  </article>
+</BaseLayout>
