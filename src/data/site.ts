@@ -77,3 +77,37 @@ export const languagesSpoken = [
   { name: 'French', name_ar: 'الفرنسية', level: 'A1 Basic', level_ar: 'مبتدئ A1' },
   { name: 'Spanish', name_ar: 'الإسبانية', level: 'A1 Basic', level_ar: 'مبتدئ A1' }
 ];
+
+/** Photography used by the burgundy/sand design (served from /public/images). */
+export const photos = {
+  headshot: '/images/headshot.jpg',
+  capital: '/images/capital.jpg',
+  awardHolding: '/images/award-holding.jpg',
+  awardRecognition: '/images/award-recognition.jpg'
+};
+
+export const education = {
+  en: 'B.Ed. Psychology, Suez Canal University (2019–2023) · Specialized Diploma in AI-Based Software Development, Digilians (2025–2026)',
+  ar: 'بكالوريوس التربية – علم النفس، جامعة قناة السويس (2019–2023) · دبلومة متخصصة في تطوير البرمجيات بالذكاء الاصطناعي، Digilians (2025–2026)'
+};
+
+/** Certificates shown with their scanned image on the home page. */
+export const certificateShowcase = [
+  { img: '/images/certs/aws-cloud-practitioner.png', title: 'AWS Certified Cloud Practitioner', meta: 'Amazon Web Services · Jul 2026', alt: 'AWS Certified Cloud Practitioner certificate' },
+  { img: '/images/certs/meta-react-basics.png', title: 'React Basics', meta: 'Meta · Coursera · Apr 2026', alt: 'React Basics certificate from Meta' },
+  { img: '/images/certs/meta-version-control.png', title: 'Version Control', meta: 'Meta · Coursera · Mar 2026', alt: 'Version Control certificate from Meta' },
+  { img: '/images/certs/packt-build-automation-ci.png', title: 'Build Automation & Continuous Integration', meta: 'Packt · Coursera · May 2026', alt: 'Build Automation and CI certificate from Packt' },
+  { img: '/images/certs/packt-devops-git.png', title: 'Foundations of DevOps and Git', meta: 'Packt · Coursera · May 2026', alt: 'Foundations of DevOps and Git certificate from Packt' },
+  { img: '/images/certs/ibm-quality-agility.png', title: 'Delivering Quality Work with Agility', meta: 'IBM · Coursera · Jan 2026', alt: 'Delivering Quality Work with Agility certificate from IBM' }
+];
+
+/** Further completed courses listed as chips under the showcase. */
+export const additionalCourses = [
+  'AWS Certified Developer – Associate (DVA-C02)',
+  'AWS Cloud Operations',
+  'Intro to Front-End Development · Meta',
+  'Programming with JavaScript · Meta',
+  'Advanced React · Meta',
+  'Advanced Git & GitHub · Packt',
+  'Advanced DevOps Tools · Packt'
+];

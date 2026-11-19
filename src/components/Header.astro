@@ -12,7 +12,6 @@ const { lang, currentPath } = Astro.props;
 const t = useTranslations(lang);
 
 const navItems = [
-  { label: t('nav.home'), href: getLocalizedPath('/', lang) },
   { label: t('nav.projects'), href: getLocalizedPath('/projects', lang) },
   { label: t('nav.certificates'), href: getLocalizedPath('/certificates', lang) },
   { label: t('nav.gallery'), href: getLocalizedPath('/gallery', lang) },
@@ -20,48 +19,54 @@ const navItems = [
   { label: t('nav.contact'), href: getLocalizedPath('/contact', lang) },
 ];
 
+const homeHref = getLocalizedPath('/', lang);
+const normalize = (p: string) => p.replace(/\/$/, '') || '/';
+const isActive = (href: string) => {
+  const cur = normalize(currentPath);
+  const target = normalize(href);
+  return cur === target || cur.startsWith(target + '/');
+};
+
 const targetLang: Lang = lang === 'en' ? 'ar' : 'en';
 const langSwitchPath = getLocalizedPath(currentPath, targetLang);
 ---
 
-<header class="sticky top-4 z-50 max-w-5xl mx-auto px-4 w-full">
+<header class="sticky top-3 sm:top-5 z-50 w-full max-w-[1240px] mx-auto px-4 sm:px-6 pt-3 sm:pt-5">
   <nav
-    class="bento-card backdrop-blur-md bg-opacity-80 dark:bg-opacity-80 rounded-full px-4 sm:px-6 py-2.5 flex items-center justify-between border border-border"
+    class="bg-burgundy rounded-full ps-2 pe-2 sm:pe-3 py-2 flex items-center gap-3 sm:gap-6 shadow-marble-md"
     aria-label="Main Navigation"
   >
-    <!-- Brand / Name -->
+    <!-- Home circle -->
     <a
-      href={getLocalizedPath('/', lang)}
-      class="flex items-center gap-2 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-silver rounded-full p-1"
+      href={homeHref}
+      aria-label={t('nav.home')}
+      aria-current={normalize(currentPath) === normalize(homeHref) ? 'page' : undefined}
+      class="w-11 h-11 sm:w-[52px] sm:h-[52px] shrink-0 rounded-full border-2 border-[#E9DCC6] text-[#E9DCC6] flex items-center justify-center hover:bg-cream/10 transition-colors"
     >
-      <div class="w-8 h-8 rounded-full bg-charcoal text-marble-white dark:bg-white dark:text-ink flex items-center justify-center font-mono text-xs font-bold transition-transform group-hover:scale-105">
-        M
-      </div>
-      <div class="flex flex-col">
-        <span class="font-serif font-bold text-sm tracking-wide text-text-primary">
-          {lang === 'ar' ? siteConfig.name_ar : siteConfig.name}
-        </span>
-        <span class="text-[10px] text-text-muted font-mono tracking-wider uppercase hidden sm:inline">
-          {lang === 'ar' ? siteConfig.role_ar : siteConfig.role}
-        </span>
-      </div>
+      <Icon name="house" class="w-5 h-5 sm:w-6 sm:h-6" />
     </a>
 
-    <!-- Desktop Nav Links -->
-    <div class="hidden lg:flex items-center gap-1 xl:gap-2">
+    <!-- Identity -->
+    <a href={homeHref} class="flex flex-col leading-tight min-w-0 no-underline">
+      <span class="text-cream font-bold text-sm sm:text-[15px] truncate">
+        {lang === 'ar' ? 'مريم جميل' : 'Mariam Gameel'}
+      </span>
+      <span class="text-latte text-[11px] truncate">
+        {lang === 'ar' ? siteConfig.role_ar : siteConfig.role}
+      </span>
+    </a>
+
+    <!-- Desktop links -->
+    <div class="hidden lg:flex flex-1 items-center justify-center gap-1 xl:gap-2">
       {navItems.map((item) => {
-        const isActive =
-          item.href === currentPath ||
-          (item.href !== '/' && item.href !== '/ar/' && currentPath.startsWith(item.href));
+        const active = isActive(item.href);
         return (
           <a
             href={item.href}
-            class={`px-3 py-1.5 rounded-full text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-silver ${
-              isActive
-                ? 'bg-ink text-marble-white dark:bg-white dark:text-ink font-semibold'
-                : 'text-text-secondary hover:text-text-primary hover:bg-mist/30 dark:hover:bg-charcoal/40'
+            class={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
+              active ? 'bg-cream text-burgundy' : 'text-cream hover:bg-cream/10'
             }`}
-            aria-current={isActive ? 'page' : undefined}
+            aria-current={active ? 'page' : undefined}
           >
             {item.label}
           </a>
@@ -69,79 +74,53 @@ const langSwitchPath = getLocalizedPath(currentPath, targetLang);
       })}
     </div>
 
-    <!-- Controls (Status, Lang, Theme, CV, Mobile Menu) -->
-    <div class="flex items-center gap-2">
-      <!-- Open for Roles Status -->
-      {siteConfig.openForRoles && (
-        <span
-          class="hidden xl:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-mist/40 dark:bg-charcoal/60 text-text-secondary border border-border"
-          title="Available for Software Engineering opportunities"
-        >
-          <span class="w-2 h-2 rounded-full bg-status-success animate-pulse"></span>
-          <span>{t('nav.openForRoles')}</span>
-        </span>
-      )}
-
-      <!-- Language Toggle -->
+    <div class="flex items-center gap-2 ms-auto lg:ms-0">
+      <!-- Language toggle -->
       <a
         href={langSwitchPath}
-        class="px-2.5 py-1 rounded-full text-xs font-medium border border-border hover:bg-mist/30 dark:hover:bg-charcoal/40 text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-silver"
-        title="Switch language"
+        class="h-11 px-3.5 rounded-full border-2 border-latte/60 text-cream text-xs font-semibold flex items-center hover:bg-cream/10 transition-colors"
         aria-label={`Switch to ${targetLang === 'ar' ? 'Arabic' : 'English'}`}
       >
         {t('nav.langToggle')}
       </a>
 
-      <!-- Theme Toggle -->
-      <button
-        id="theme-toggle-btn"
-        type="button"
-        class="w-8 h-8 rounded-full border border-border flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-mist/30 dark:hover:bg-charcoal/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-silver"
-        aria-label={t('nav.themeToggle')}
-      >
-        <span class="dark:hidden">
-          <Icon name="moon" class="w-4 h-4" />
-        </span>
-        <span class="hidden dark:inline">
-          <Icon name="sun" class="w-4 h-4" />
-        </span>
-      </button>
-
-      <!-- Download CV Button -->
+      <!-- CV -->
       <a
         href={siteConfig.cvUrl}
         download="Mariam_Gameel_CV.pdf"
-        class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-ink text-marble-white dark:bg-white dark:text-ink hover:opacity-90 transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-silver"
+        class="hidden sm:inline-flex h-11 sm:h-12 items-center gap-2 px-5 whitespace-nowrap rounded-full bg-cream text-burgundy font-bold text-sm hover:bg-white transition-colors"
       >
-        <Icon name="download" class="w-3.5 h-3.5" />
-        <span>{t('nav.resume')}</span>
+        <Icon name="download" class="w-[18px] h-[18px]" />
+        <span>{t('hero.downloadCv')}</span>
       </a>
 
-      <!-- Mobile Hamburger Button -->
+      <!-- Mobile menu button -->
       <button
         id="mobile-menu-btn"
         type="button"
-        class="lg:hidden w-8 h-8 rounded-full border border-border flex items-center justify-center text-text-primary hover:bg-mist/30 dark:hover:bg-charcoal/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-silver"
+        class="lg:hidden w-11 h-11 rounded-full bg-cream text-burgundy flex items-center justify-center"
         aria-label="Toggle navigation menu"
         aria-expanded="false"
         aria-controls="mobile-menu-drawer"
       >
-        <Icon name="menu" class="w-4 h-4 menu-open-icon" />
-        <Icon name="x" class="w-4 h-4 menu-close-icon hidden" />
+        <Icon name="menu" class="w-5 h-5 menu-open-icon" />
+        <Icon name="x" class="w-5 h-5 menu-close-icon hidden" />
       </button>
     </div>
   </nav>
 
-  <!-- Mobile Drawer Menu -->
-  <div
-    id="mobile-menu-drawer"
-    class="hidden lg:hidden mt-2 p-4 bento-card rounded-2xl border border-border backdrop-blur-xl bg-opacity-95 dark:bg-opacity-95 shadow-marble-lg"
-  >
-    <div class="flex flex-col gap-2">
+  <!-- Mobile drawer -->
+  <div id="mobile-menu-drawer" class="hidden lg:hidden mt-2 p-3 rounded-[28px] bg-burgundy shadow-marble-lg">
+    <div class="flex flex-col gap-1">
+      <a href={homeHref} class="px-4 py-3 rounded-2xl text-sm font-semibold text-cream hover:bg-cream/10">
+        {t('nav.home')}
+      </a>
       {navItems.map((item) => (
         <a
           href={item.href}
-          class="px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-mist/30 dark:hover:bg-charcoal/40 text-text-primary transition-colors"
+          class={`px-4 py-3 rounded-2xl text-sm font-semibold ${
+            isActive(item.href) ? 'bg-cream text-burgundy' : 'text-cream hover:bg-cream/10'
+          }`}
         >
           {item.label}
         </a>
@@ -149,60 +128,38 @@ const langSwitchPath = getLocalizedPath(currentPath, targetLang);
       <a
         href={siteConfig.cvUrl}
         download="Mariam_Gameel_CV.pdf"
-        class="mt-2 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-ink text-marble-white dark:bg-white dark:text-ink"
+        class="mt-2 flex items-center justify-center gap-2 h-12 rounded-2xl text-sm font-bold bg-cream text-burgundy"
       >
         <Icon name="download" class="w-4 h-4" />
-        <span>{t('nav.resume')} (PDF)</span>
+        <span>{t('hero.downloadCv')}</span>
       </a>
     </div>
   </div>
 </header>
 
 <script>
-  // Mobile menu controller
   const menuBtn = document.getElementById('mobile-menu-btn');
   const drawer = document.getElementById('mobile-menu-drawer');
   const openIcon = menuBtn?.querySelector('.menu-open-icon');
   const closeIcon = menuBtn?.querySelector('.menu-close-icon');
 
+  const setOpen = (open: boolean) => {
+    menuBtn?.setAttribute('aria-expanded', String(open));
+    drawer?.classList.toggle('hidden', !open);
+    openIcon?.classList.toggle('hidden', open);
+    closeIcon?.classList.toggle('hidden', !open);
+  };
+
   menuBtn?.addEventListener('click', () => {
-    const isExpanded = menuBtn.getAttribute('aria-expanded') === 'true';
-    menuBtn.setAttribute('aria-expanded', String(!isExpanded));
-    drawer?.classList.toggle('hidden');
-    openIcon?.classList.toggle('hidden');
-    closeIcon?.classList.toggle('hidden');
+    setOpen(menuBtn.getAttribute('aria-expanded') !== 'true');
   });
 
-  // Close drawer on link click or Escape
-  drawer?.querySelectorAll('a').forEach((link) => {
-    link.addEventListener('click', () => {
-      drawer.classList.add('hidden');
-      menuBtn?.setAttribute('aria-expanded', 'false');
-      openIcon?.classList.remove('hidden');
-      closeIcon?.classList.add('hidden');
-    });
-  });
+  drawer?.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => setOpen(false)));
 
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !drawer?.classList.contains('hidden')) {
-      drawer?.classList.add('hidden');
-      menuBtn?.setAttribute('aria-expanded', 'false');
-      openIcon?.classList.remove('hidden');
-      closeIcon?.classList.add('hidden');
+  drawer?.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      setOpen(false);
       menuBtn?.focus();
-    }
-  });
-
-  // Theme toggle script
-  const themeBtn = document.getElementById('theme-toggle-btn');
-  themeBtn?.addEventListener('click', () => {
-    const isDark = document.documentElement.classList.contains('dark');
-    const newTheme = isDark ? 'light' : 'dark';
-    document.documentElement.classList.toggle('dark', newTheme === 'dark');
-    try {
-      localStorage.setItem('theme', newTheme);
-    } catch (e) {
-      // localStorage disabled/restricted
     }
   });
 </script>

@@ -11,51 +11,39 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 ---
 
-<footer class="mt-20 border-t border-border pt-12 pb-16 text-text-secondary text-xs">
-  <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-6">
-    <!-- Brand / Identity -->
-    <div class="flex flex-col items-center sm:items-start gap-1">
-      <span class="font-serif font-bold text-sm text-text-primary tracking-wide">
-        {lang === 'ar' ? siteConfig.name_ar : siteConfig.name}
-      </span>
-      <p class="text-[11px] text-text-muted">
-        © {new Date().getFullYear()} {siteConfig.name}. {t('footer.rights')}
-      </p>
-    </div>
-
-    <!-- Social Links -->
-    <div class="flex items-center gap-4 text-xs font-medium">
+<footer class="w-full max-w-[1240px] mx-auto px-4 sm:px-6 pb-10 pt-4">
+  <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-[13px] text-wine">
+    <p>
+      © {new Date().getFullYear()} {lang === 'ar' ? siteConfig.name_ar : siteConfig.name} ·
+      {lang === 'ar' ? siteConfig.role_ar : siteConfig.role}
+    </p>
+    <div class="flex items-center gap-2">
       <a
         href={siteConfig.github}
         target="_blank"
         rel="noopener noreferrer"
-        class="flex items-center gap-1.5 hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-silver rounded"
+        aria-label="GitHub"
+        class="w-11 h-11 rounded-full bg-burgundy text-cream flex items-center justify-center hover:bg-burgundy-dark transition-colors"
       >
-        <Icon name="github" class="w-4 h-4" />
-        <span>GitHub</span>
+        <Icon name="github" class="w-[18px] h-[18px]" />
       </a>
-
       <a
         href={siteConfig.linkedin}
         target="_blank"
         rel="noopener noreferrer"
-        class="flex items-center gap-1.5 hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-silver rounded"
+        aria-label="LinkedIn"
+        class="w-11 h-11 rounded-full bg-burgundy text-cream flex items-center justify-center hover:bg-burgundy-dark transition-colors"
       >
-        <Icon name="linkedin" class="w-4 h-4" />
-        <span>LinkedIn</span>
+        <Icon name="linkedin" class="w-[18px] h-[18px]" />
       </a>
-
       <a
         href={`mailto:${siteConfig.email}`}
-        class="flex items-center gap-1.5 hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-silver rounded"
+        aria-label={siteConfig.email}
+        class="w-11 h-11 rounded-full bg-burgundy text-cream flex items-center justify-center hover:bg-burgundy-dark transition-colors"
       >
-        <Icon name="mail" class="w-4 h-4" />
-        <span>{siteConfig.email}</span>
+        <Icon name="mail" class="w-[18px] h-[18px]" />
       </a>
     </div>
   </div>
-
-  <div class="max-w-5xl mx-auto px-4 text-center mt-6 text-[10px] text-text-muted">
-    {t('footer.builtWith')}
-  </div>
+  <p class="sr-only">{t('footer.rights')}</p>
 </footer>

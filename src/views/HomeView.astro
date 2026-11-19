@@ -1,11 +1,16 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import ThreeHero from '../components/ThreeHero.astro';
-import ProjectCard from '../components/ProjectCard.astro';
-import CertificateCard from '../components/CertificateCard.astro';
 import Icon from '../components/Icon.astro';
-import { siteConfig, technicalStack } from '../data/site';
+import {
+  siteConfig,
+  technicalStack,
+  languagesSpoken,
+  photos,
+  education,
+  certificateShowcase,
+  additionalCourses
+} from '../data/site';
 import { getLocalizedPath, useTranslations, type Lang } from '../i18n/utils';
 
 interface Props {
@@ -14,232 +19,308 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = useTranslations(lang);
+const ar = lang === 'ar';
+const L = (en: string, arText: string) => (ar ? arText : en);
 
-// Content queries
-const allProjects = await getCollection('projects', ({ data }) => !data.draft);
-const featuredProjects = allProjects
+// ---- Content ----
+const projects = (await getCollection('projects', ({ data }) => !data.draft))
   .filter((p) => p.data.featured)
-  .sort((a, b) => a.data.order - b.data.order)
-  .slice(0, 3);
+  .sort((a, b) => a.data.order - b.data.order);
 
-const allCertificates = await getCollection('certificates', ({ data }) => !data.draft);
-const featuredCertificates = allCertificates
-  .filter((c) => c.data.featured)
-  .sort((a, b) => a.data.order - b.data.order)
-  .slice(0, 2);
+const experience = (await getCollection('experience')).sort((a, b) => a.data.order - b.data.order);
 
-// Computed stats (no hardcoded numbers)
-const totalProjectsCount = allProjects.length;
-const totalCertificatesCount = allCertificates.length;
-const activeCertificatesCount = allCertificates.filter((c) => {
-  if (!c.data.expiryDate) return true;
-  return new Date(c.data.expiryDate) >= new Date();
-}).length;
+const months = ar
+  ? ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+  : ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+const fmt = (ym?: string) => {
+  if (!ym) return ar ? 'حتى الآن' : 'PRESENT';
+  const [y, m] = ym.split('-');
+  return `${months[Number(m) - 1]} ${y}`;
+};
+const period = (start: string, end?: string) =>
+  start === end ? fmt(start) : `${fmt(start)} – ${fmt(end)}`;
+
+const skillGroups = [
+  { label: L('Languages', 'لغات البرمجة'), cat: 'languages' },
+  { label: L('Frontend', 'الواجهات الأمامية'), cat: 'frontend' },
+  { label: L('Backend & Data', 'الخلفية وقواعد البيانات'), cat: 'backend' },
+  { label: L('AI, Cloud & Security', 'الذكاء الاصطناعي والسحابة والأمان'), cat: 'cloud_security' }
+].map((g) => ({ ...g, items: technicalStack.filter((s) => s.category === g.cat).map((s) => s.name) }));
+
+const stats = [
+  { value: experience.length, label: L('internships', 'تدريب عملي') },
+  { value: projects.length, label: L('full-stack projects', 'مشاريع متكاملة') },
+  { value: certificateShowcase.length + additionalCourses.length, label: L('courses & certificates', 'دورة وشهادة') },
+  { value: languagesSpoken.length, label: L('languages', 'لغات') }
+];
+
+const shortLevel = (lvl: string) => lvl.split(' ')[0];
+const arrow = ar ? 'arrow-left' : 'arrow-right';
+const contactHref = getLocalizedPath('/contact', lang);
+const certsHref = getLocalizedPath('/certificates', lang);
 ---
 
 <BaseLayout lang={lang}>
-  <!-- ==================== HERO SECTION ==================== -->
-  <section class="space-y-8 pt-4 pb-12">
-    <!-- Hero Container Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-      <!-- Left Column: Concise Narrative & CTAs -->
-      <div class="lg:col-span-7 space-y-5">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-mist/40 dark:bg-charcoal text-text-secondary border border-border">
-          <span class="w-2 h-2 rounded-full bg-status-success"></span>
-          <span>{t('hero.badge')}</span>
+  <div class="flex flex-col gap-6 sm:gap-10">
+    <!-- ============ HERO ============ -->
+    <section class="bg-sand rounded-[32px] sm:rounded-5xl p-3.5 sm:p-6 pb-6 sm:pb-10 flex flex-col gap-6 sm:gap-9">
+      <div class="relative h-[380px] sm:h-[560px] rounded-[22px] sm:rounded-[30px] overflow-hidden bg-burgundy">
+        <img
+          src={photos.capital}
+          alt={L('Mariam standing in front of a government building in the New Administrative Capital', 'مريم أمام مبنى حكومي في العاصمة الإدارية الجديدة')}
+          class="w-full h-full object-cover [object-position:50%_58%]"
+          fetchpriority="high"
+        />
+        <div class="absolute start-3.5 top-3.5 sm:top-auto sm:start-7 sm:bottom-7 w-28 h-28 sm:w-[220px] sm:h-[220px] bg-burgundy rounded-[22px] sm:rounded-[32px] p-2.5 sm:p-[18px]">
+          <img
+            src={photos.headshot}
+            alt={L('Professional headshot of Mariam Gameel', 'صورة شخصية مهنية لمريم جميل')}
+            class="w-full h-full object-cover [object-position:50%_25%] rounded-[14px] sm:rounded-[20px]"
+          />
         </div>
-
-        <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-text-primary leading-[1.12]">
-          {lang === 'ar' ? siteConfig.name_ar : siteConfig.name}
-        </h1>
-
-        <p class="text-base sm:text-lg text-text-secondary font-medium leading-relaxed max-w-xl">
-          {lang === 'ar' ? siteConfig.tagline_ar : siteConfig.tagline}
-        </p>
-
-        <!-- Primary Call to Actions -->
-        <div class="flex flex-wrap items-center gap-3 pt-2">
-          <a
-            href={getLocalizedPath('/projects', lang)}
-            class="px-5 py-2.5 rounded-full bg-ink text-marble-white dark:bg-white dark:text-ink font-semibold text-xs hover:opacity-90 transition-all flex items-center gap-2 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-silver"
-          >
-            <span>{t('hero.viewProjects')}</span>
-            <Icon name={lang === 'ar' ? 'arrow-left' : 'arrow-right'} class="w-3.5 h-3.5" />
-          </a>
-
-          <a
-            href={siteConfig.cvUrl}
-            download="Mariam_Gameel_CV.pdf"
-            class="px-5 py-2.5 rounded-full border border-border hover:bg-mist/30 dark:hover:bg-charcoal/40 text-text-primary font-semibold text-xs transition-colors flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-silver"
-          >
-            <Icon name="download" class="w-3.5 h-3.5" />
-            <span>{t('hero.downloadCv')}</span>
-          </a>
-
-          <a
-            href={getLocalizedPath('/contact', lang)}
-            class="px-5 py-2.5 rounded-full hover:bg-mist/30 dark:hover:bg-charcoal/40 text-text-secondary hover:text-text-primary text-xs font-medium transition-colors"
-          >
-            {t('hero.contactMe')}
-          </a>
-        </div>
-
-        <!-- Computed Metric Strip -->
-        <div class="grid grid-cols-3 gap-4 pt-4 border-t border-border/70 max-w-md text-xs font-mono">
-          <div>
-            <div class="text-xl font-bold text-text-primary font-serif">{totalProjectsCount}</div>
-            <div class="text-[10px] text-text-muted uppercase">Production Systems</div>
-          </div>
-          <div>
-            <div class="text-xl font-bold text-text-primary font-serif">{totalCertificatesCount}</div>
-            <div class="text-[10px] text-text-muted uppercase">Certifications</div>
-          </div>
-          <div>
-            <div class="text-xl font-bold text-text-primary font-serif">{activeCertificatesCount}</div>
-            <div class="text-[10px] text-text-muted uppercase">Active Cloud Certs</div>
+        <div class="absolute start-3.5 end-3.5 bottom-3.5 sm:start-auto sm:end-7 sm:bottom-7 bg-burgundy rounded-[20px] sm:rounded-[28px] p-2 sm:p-3 pe-4 sm:pe-8 flex items-center gap-3 sm:gap-4">
+          <img src={photos.awardRecognition} alt="" class="w-12 h-12 sm:w-[72px] sm:h-[72px] object-cover [object-position:50%_30%] rounded-xl sm:rounded-[18px]" />
+          <div class="flex flex-col gap-0.5 sm:gap-1">
+            <span class="text-cream font-bold text-[15px] sm:text-lg">{L('Mariam Gameel', 'مريم جميل')}</span>
+            <span class="text-latte text-[11px] sm:text-[13px]">{ar ? siteConfig.role_ar : siteConfig.role}</span>
           </div>
         </div>
       </div>
 
-      <!-- Right Column: Lightweight 3D Monolith (Lazy loaded, no portraits) -->
-      <div class="lg:col-span-5">
-        <ThreeHero />
-        <!-- Subtle text link to gallery per instructions -->
-        <div class="text-center mt-3">
-          <a
-            href={getLocalizedPath('/gallery', lang)}
-            class="text-[11px] text-text-muted hover:text-text-primary underline transition-colors"
-          >
-            {t('hero.seeGallery')} →
+      <div class="flex flex-wrap items-center gap-6 sm:gap-x-12 sm:gap-y-8 px-1.5 sm:px-4">
+        <div class="flex justify-between sm:justify-start w-full sm:w-auto gap-5 shrink-0">
+          <img src={photos.awardHolding} alt={L('Mariam holding her ACUD award', 'مريم تحمل جائزة ACUD')} class="w-24 h-24 sm:w-[120px] sm:h-[120px] rounded-full object-cover [object-position:50%_45%]" />
+          <img src={photos.awardRecognition} alt={L('Mariam receiving recognition at ACUD', 'مريم أثناء تكريمها في ACUD')} class="w-24 h-24 sm:w-[120px] sm:h-[120px] rounded-full object-cover [object-position:50%_30%]" />
+          <img src={photos.capital} alt={L('Mariam at the New Administrative Capital', 'مريم في العاصمة الإدارية الجديدة')} class="w-24 h-24 sm:w-[120px] sm:h-[120px] rounded-full object-cover [object-position:50%_30%]" />
+        </div>
+        <div class="flex-[1_1_420px] flex flex-col gap-3">
+          <h1 class="m-0 text-2xl sm:text-[34px] font-bold text-burgundy leading-tight">
+            {ar ? siteConfig.name_ar : siteConfig.name}
+          </h1>
+          <p class="m-0 text-[13px] sm:text-[15px] leading-relaxed text-cocoa max-w-[680px]">
+            {L(
+              'Junior Software Engineer building full-stack products with JavaScript, React, PHP, Laravel, Node.js and Express. I design RESTful APIs, work across relational and NoSQL databases, and integrate local LLMs into real applications. My background in Psychology brings a human-centred lens to every interface I build.',
+              'مهندسة برمجيات مبتدئة أبني منتجات متكاملة باستخدام JavaScript وReact وPHP وLaravel وNode.js وExpress. أصمم واجهات RESTful، وأعمل مع قواعد البيانات العلائقية وNoSQL، وأدمج نماذج اللغة المحلية في تطبيقات حقيقية. خلفيتي في علم النفس تضيف منظورًا إنسانيًا لكل واجهة أبنيها.'
+            )}
+          </p>
+          <div class="flex flex-wrap gap-3 mt-1.5">
+            <a href={siteConfig.cvUrl} download="Mariam_Gameel_CV.pdf" class="h-12 px-6 rounded-full bg-burgundy text-cream font-semibold text-sm inline-flex items-center gap-2.5 hover:bg-burgundy-dark transition-colors">
+              <Icon name="download" class="w-[18px] h-[18px]" />
+              {t('hero.downloadCv')}
+            </a>
+            <a href="#certificates" class="h-12 px-6 rounded-full border-2 border-burgundy text-burgundy font-semibold text-sm inline-flex items-center hover:bg-burgundy hover:text-cream transition-colors">
+              {L('View certificates', 'عرض الشهادات')}
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROFILE ROW ============ -->
+    <section class="flex flex-wrap gap-3 sm:gap-6">
+      <div class="flex-[1_1_440px] bg-sand rounded-[24px] sm:rounded-4xl p-2 sm:p-4 flex min-h-[260px] sm:min-h-[520px]">
+        <img
+          src={photos.awardRecognition}
+          alt={L('Mariam with her award at the Administrative Capital for Urban Development', 'مريم مع جائزتها في شركة العاصمة الإدارية للتنمية العمرانية')}
+          class="w-full object-cover [object-position:50%_35%] rounded-[18px] sm:rounded-3xl"
+          loading="lazy"
+        />
+      </div>
+      <div class="flex-[1.2_1_520px] bg-burgundy rounded-[24px] sm:rounded-4xl p-2 sm:p-5 flex flex-col justify-between gap-3 sm:gap-7">
+        <div class="bg-sand rounded-[18px] sm:rounded-[26px] p-5 sm:p-8 flex flex-col gap-5 sm:gap-6">
+          <div class="flex flex-col gap-1.5">
+            <h2 class="m-0 text-2xl sm:text-[32px] font-bold text-wine">{L('Mariam Gameel', 'مريم جميل')}</h2>
+            <span class="text-base text-cocoa">{L('Junior Full-Stack Software Engineer', 'مهندسة برمجيات فل-ستاك مبتدئة')}</span>
+          </div>
+          <a href={siteConfig.github} target="_blank" rel="noopener noreferrer" class="self-start font-bold text-lg sm:text-xl text-wine inline-flex items-center gap-2 no-underline hover:underline" dir="ltr">
+            <Icon name="github" class="w-5 h-5" />
+            mariamgameel
+          </a>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {stats.map((s) => (
+              <div class="flex flex-col gap-0.5">
+                <span class="text-[26px] font-bold text-wine">{s.value}</span>
+                <span class="text-xs text-cocoa">{s.label}</span>
+              </div>
+            ))}
+          </div>
+          <p class="m-0 text-sm leading-relaxed text-cocoa">{ar ? education.ar : education.en}</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <a href={siteConfig.cvUrl} download="Mariam_Gameel_CV.pdf" class="flex-[1_1_160px] h-[52px] rounded-[14px] bg-cream text-burgundy font-bold text-sm flex items-center justify-center hover:bg-white transition-colors">
+            {t('hero.downloadCv')}
+          </a>
+          <a href={contactHref} class="flex-[1_1_160px] h-[52px] rounded-[14px] bg-cream text-burgundy font-bold text-sm flex items-center justify-center hover:bg-white transition-colors">
+            {L('Contact me', 'تواصل معي')}
+          </a>
+          <a href={siteConfig.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="w-[52px] h-[52px] shrink-0 rounded-[14px] bg-cream text-burgundy flex items-center justify-center hover:bg-white transition-colors">
+            <Icon name="linkedin" class="w-5 h-5" />
           </a>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ==================== FEATURED PROJECTS SECTION ==================== -->
-  <section class="space-y-6 pt-8 pb-12 border-t border-border">
-    <div class="flex items-center justify-between">
-      <div>
-        <h2 class="font-serif text-3xl font-bold text-text-primary">
-          {t('projects.featuredTitle')}
-        </h2>
-        <p class="text-xs text-text-muted mt-1">
-          {t('projects.subtitle')}
-        </p>
+    <!-- ============ EXPERIENCE + SKILLS ============ -->
+    <section id="experience" class="flex flex-wrap gap-3 sm:gap-6 scroll-mt-28">
+      <div class="flex-[1.3_1_520px] bg-sand rounded-[28px] sm:rounded-4xl p-6 sm:p-9 flex flex-col gap-5 sm:gap-6">
+        <h2 class="m-0 text-xl sm:text-[26px] font-bold text-burgundy">{L('Experience', 'الخبرة العملية')}</h2>
+        {experience.map((job, i) => (
+          <>
+            {i > 0 && <div class="h-px bg-divider" />}
+            <div class="flex gap-5">
+              <div class={`w-3.5 h-3.5 rounded-full mt-1 shrink-0 ${i === 0 ? 'bg-burgundy' : 'border-[3px] border-burgundy'}`} />
+              <div class="flex flex-col gap-1.5">
+                <span class="text-[11px] sm:text-xs font-semibold tracking-[0.06em] text-burgundy">
+                  {period(job.data.start, job.data.end)}
+                </span>
+                <span class="text-[15px] sm:text-lg font-bold text-wine">
+                  {ar ? job.data.role_ar ?? job.data.role : job.data.role} — {ar ? job.data.org_ar ?? job.data.org : job.data.org}
+                </span>
+                <span class="text-[13px] sm:text-sm leading-relaxed text-cocoa">
+                  {ar ? job.data.summary_ar ?? job.data.summary : job.data.summary}
+                </span>
+              </div>
+            </div>
+          </>
+        ))}
       </div>
 
-      <a
-        href={getLocalizedPath('/projects', lang)}
-        class="inline-flex items-center gap-1.5 text-xs font-semibold text-text-primary hover:underline"
-      >
-        <span>{t('projects.viewAll')}</span>
-        <Icon name={lang === 'ar' ? 'arrow-left' : 'arrow-right'} class="w-3.5 h-3.5" />
-      </a>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {featuredProjects.map((project) => (
-        <ProjectCard project={project} lang={lang} />
-      ))}
-    </div>
-  </section>
-
-  <!-- ==================== HUMAN-CENTERED ENGINEERING TEASER ==================== -->
-  <section class="bento-card rounded-3xl p-7 sm:p-9 my-8 border border-border relative overflow-hidden">
-    <div class="max-w-2xl space-y-3">
-      <div class="inline-flex items-center gap-2 text-xs font-mono text-text-muted uppercase tracking-wider">
-        <Icon name="brain" class="w-4 h-4 text-text-primary" />
-        <span>Cognitive Ergonomics & Architecture</span>
+      <div class="flex-[1_1_420px] bg-burgundy rounded-[28px] sm:rounded-4xl p-6 sm:p-9 flex flex-col gap-5 text-cream">
+        <h2 class="m-0 text-xl sm:text-[26px] font-bold">{L('Skills', 'المهارات')}</h2>
+        {skillGroups.map((g) => (
+          <div class="flex flex-col gap-2.5">
+            <span class="text-xs font-semibold tracking-[0.08em] text-latte uppercase">{g.label}</span>
+            <div class="flex flex-wrap gap-2">
+              {g.items.map((s) => (
+                <span class="bg-sand text-burgundy-dark rounded-full px-3.5 py-1.5 text-[13px] font-semibold" dir="ltr">{s}</span>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
+    </section>
 
-      <h3 class="font-serif text-2xl sm:text-3xl font-bold text-text-primary">
-        {t('about.storyTitle')}
-      </h3>
-
-      <p class="text-xs sm:text-sm text-text-secondary leading-relaxed">
-        My academic background in Psychology directly shapes my engineering discipline: it provides a quantitative framework for analyzing user cognitive load, designing predictable API contracts, and writing defensive error-handling logic that prevents human error before it happens.
-      </p>
-
-      <div class="pt-2">
-        <a
-          href={getLocalizedPath('/about', lang)}
-          class="inline-flex items-center gap-1.5 text-xs font-semibold text-text-primary hover:underline"
-        >
-          <span>Read the engineering philosophy & background</span>
-          <Icon name={lang === 'ar' ? 'arrow-left' : 'arrow-right'} class="w-3.5 h-3.5" />
+    <!-- ============ PROJECTS ============ -->
+    <section id="projects" class="bg-sand rounded-[28px] sm:rounded-5xl p-3.5 sm:p-6 flex flex-col gap-4 sm:gap-6 scroll-mt-28">
+      <div class="pill-header">
+        <span class="pill-icon"><Icon name="code" class="w-[18px] h-[18px]" /></span>
+        <h2 class="m-0 text-[15px] sm:text-[17px] font-bold flex-1">{t('nav.projects')}</h2>
+        <a href={getLocalizedPath('/projects', lang)} aria-label={t('projects.viewAll')} class="text-[13px] text-latte hover:text-cream inline-flex items-center gap-1.5 shrink-0 min-h-11 px-1">
+          <span class="hidden sm:inline">{t('projects.viewAll')}</span>
+          <Icon name={arrow} class="w-4 h-4" />
         </a>
       </div>
-    </div>
-  </section>
+      <div class="flex flex-wrap gap-3 sm:gap-6">
+        {projects.map((p, i) => {
+          const dark = i % 2 === 1;
+          return (
+            <a
+              href={getLocalizedPath(`/projects/${p.slug}`, lang)}
+              class={`group flex-[1_1_460px] rounded-[24px] sm:rounded-[28px] p-6 sm:p-8 flex flex-col gap-3 sm:gap-4 no-underline transition-transform hover:-translate-y-0.5 ${
+                dark ? 'bg-burgundy' : 'bg-cream'
+              }`}
+            >
+              <span class={`text-[11px] sm:text-xs font-semibold tracking-[0.08em] uppercase ${dark ? 'text-latte' : 'text-burgundy'}`}>
+                {p.data.category.join(' · ')}
+              </span>
+              <h3 class={`m-0 text-[17px] sm:text-[22px] font-bold ${dark ? 'text-cream' : 'text-wine'}`}>
+                {ar ? p.data.title_ar ?? p.data.title : p.data.title}
+              </h3>
+              <p class={`m-0 text-[13px] sm:text-sm leading-relaxed ${dark ? 'text-blush' : 'text-cocoa'}`}>
+                {ar ? p.data.summary_ar ?? p.data.summary : p.data.summary}
+              </p>
+              <div class="flex flex-wrap gap-2 mt-auto pt-1" dir="ltr">
+                {p.data.tech.slice(0, 6).map((tech) => (
+                  <span class={`rounded-full px-3 py-1 text-xs font-semibold border-[1.5px] ${dark ? 'border-latte text-cream' : 'border-burgundy text-burgundy'}`}>
+                    {tech}
+                  </span>
+                ))}
+              </div>
+              <span class={`inline-flex items-center gap-1.5 text-sm font-bold ${dark ? 'text-cream' : 'text-burgundy'}`}>
+                {t('projects.inspect')}
+                <Icon name={arrow} class="w-4 h-4 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
+              </span>
+            </a>
+          );
+        })}
+      </div>
+    </section>
 
-  <!-- ==================== CORE TECHNICAL STACK STRIP ==================== -->
-  <section class="space-y-4 py-8 border-t border-border">
-    <div class="flex items-center justify-between">
-      <h3 class="font-serif text-2xl font-bold text-text-primary">
-        Technical Stack
-      </h3>
-      <a
-        href={getLocalizedPath('/about#stack', lang)}
-        class="text-xs text-text-muted hover:text-text-primary underline"
-      >
-        View full matrix →
-      </a>
-    </div>
+    <!-- ============ CERTIFICATES ============ -->
+    <section id="certificates" class="bg-sand rounded-[28px] sm:rounded-5xl p-3.5 sm:p-6 sm:pb-9 flex flex-col gap-4 sm:gap-6 scroll-mt-28">
+      <div class="pill-header">
+        <span class="pill-icon"><Icon name="award" class="w-[18px] h-[18px]" /></span>
+        <h2 class="m-0 text-[15px] sm:text-[17px] font-bold flex-1">{t('nav.certificates')}</h2>
+        <a href={certsHref} aria-label={t('certificates.viewAll')} class="text-[13px] text-latte hover:text-cream inline-flex items-center gap-1.5 shrink-0 min-h-11 px-1">
+          <span class="hidden sm:inline">{t('certificates.viewAll')}</span>
+          <Icon name={arrow} class="w-4 h-4" />
+        </a>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-5">
+        {certificateShowcase.map((c) => (
+          <figure class="m-0 bg-cream rounded-2xl sm:rounded-3xl p-1.5 sm:p-3 flex flex-col gap-1.5 sm:gap-3">
+            <img src={c.img} alt={c.alt} loading="lazy" class="w-full aspect-[660/510] object-cover rounded-[10px] sm:rounded-[14px] bg-white" />
+            <figcaption class="flex flex-col gap-0.5 px-1 sm:px-1.5 pb-1 sm:pb-1.5" dir="ltr">
+              <span class="text-[11px] sm:text-[15px] font-bold text-wine leading-snug">{c.title}</span>
+              <span class="hidden sm:block text-xs text-burgundy font-semibold">{c.meta}</span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+      <div class="flex flex-col gap-3 px-2">
+        <span class="text-xs font-semibold tracking-[0.08em] text-burgundy">{L('ALSO COMPLETED', 'دورات أخرى مكتملة')}</span>
+        <div class="flex flex-wrap gap-2" dir="ltr">
+          {additionalCourses.map((name) => (
+            <span class="bg-cream text-burgundy-dark rounded-full px-3.5 py-2 text-[13px] font-medium">{name}</span>
+          ))}
+        </div>
+      </div>
+    </section>
 
-    <div class="flex flex-wrap gap-2">
-      {technicalStack.map((item) => (
-        <span class="px-3 py-1.5 rounded-full text-xs font-mono bg-mist/30 dark:bg-charcoal text-text-secondary border border-border">
-          {item.name}
-        </span>
-      ))}
-    </div>
-  </section>
-
-  <!-- ==================== LATEST VERIFIED CREDENTIALS STRIP ==================== -->
-  <section class="space-y-6 py-8 border-t border-border">
-    <div class="flex items-center justify-between">
-      <div>
-        <h3 class="font-serif text-2xl font-bold text-text-primary">
-          {t('certificates.latestTitle')}
-        </h3>
-        <p class="text-xs text-text-muted mt-0.5">
-          Amazon Web Services Official Verifications (Active through 2029)
-        </p>
+    <!-- ============ CONTACT ============ -->
+    <section id="contact" class="flex flex-wrap gap-3 sm:gap-6 items-stretch scroll-mt-28">
+      <div class="flex-[1_1_420px] bg-sand rounded-[28px] sm:rounded-4xl px-6 sm:px-8 py-8 sm:py-10 flex flex-col items-center justify-center gap-3.5">
+        <div class="w-[132px] h-[132px] rounded-full border-[5px] border-burgundy p-1">
+          <img src={photos.headshot} alt={siteConfig.name} class="w-full h-full rounded-full object-cover [object-position:50%_25%]" loading="lazy" />
+        </div>
+        <span class="text-xl font-semibold text-burgundy" dir="ltr">@mariamgameel</span>
+        <div class="flex flex-wrap justify-center gap-x-9 gap-y-4 mt-1.5">
+          {languagesSpoken.map((l) => (
+            <div class="flex flex-col items-center gap-0.5">
+              <span class="text-xl font-bold text-burgundy">{ar ? l.level_ar : shortLevel(l.level)}</span>
+              <span class="text-[13px] text-cocoa">{ar ? l.name_ar : l.name}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <a
-        href={getLocalizedPath('/certificates', lang)}
-        class="inline-flex items-center gap-1.5 text-xs font-semibold text-text-primary hover:underline"
-      >
-        <span>{t('certificates.viewAll')}</span>
-        <Icon name={lang === 'ar' ? 'arrow-left' : 'arrow-right'} class="w-3.5 h-3.5" />
-      </a>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {featuredCertificates.map((cert) => (
-        <CertificateCard cert={cert} lang={lang} />
-      ))}
-    </div>
-  </section>
-
-  <!-- ==================== BOTTOM CONTACT CTA ==================== -->
-  <section class="text-center py-12 border-t border-border space-y-4">
-    <h3 class="font-serif text-3xl font-bold text-text-primary">
-      {lang === 'ar' ? 'جاهزون لبناء شيء استثنائي؟' : 'Ready to build something exceptional?'}
-    </h3>
-    <p class="text-xs sm:text-sm text-text-secondary max-w-md mx-auto">
-      {t('contact.subtitle')}
-    </p>
-    <div>
-      <a
-        href={getLocalizedPath('/contact', lang)}
-        class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-ink text-marble-white dark:bg-white dark:text-ink font-semibold text-xs hover:opacity-90 transition-all shadow-sm"
-      >
-        <Icon name="mail" class="w-4 h-4" />
-        <span>{t('hero.contactMe')}</span>
-      </a>
-    </div>
-  </section>
+      <div class="flex-[1.2_1_480px] bg-burgundy rounded-[28px] sm:rounded-4xl p-3 sm:p-[18px] flex">
+        <div class="relative flex-1 rounded-[20px] sm:rounded-3xl overflow-hidden min-h-[420px] flex">
+          <img src={photos.capital} alt="" class="absolute inset-0 w-full h-full object-cover [object-position:50%_20%]" loading="lazy" />
+          <div class="absolute inset-0 bg-wine/60" />
+          <div class="relative flex-1 p-6 sm:p-9 flex flex-col justify-end gap-4 sm:gap-[18px] text-cream">
+            <h2 class="m-0 text-[28px] sm:text-4xl font-bold">{L('Let’s build something.', 'لنبنِ شيئًا معًا.')}</h2>
+            <p class="m-0 text-[15px] leading-relaxed text-blush max-w-[440px]">
+              {L('Open to junior full-stack and software-engineering roles, internships and freelance projects.', 'متاحة لوظائف هندسة البرمجيات والتطوير المتكامل للمبتدئين، والتدريب، والمشاريع المستقلة.')}
+            </p>
+            <div class="flex flex-col gap-2.5 text-[15px]" dir="ltr">
+              <a href={`mailto:${siteConfig.email}`} class="text-cream no-underline hover:underline inline-flex items-center gap-2.5 self-start">
+                <Icon name="mail" class="w-[18px] h-[18px]" />{siteConfig.email}
+              </a>
+              <a href={`tel:${siteConfig.phone.replace(/[^+\d]/g, '')}`} class="text-cream no-underline hover:underline inline-flex items-center gap-2.5 self-start">
+                <Icon name="phone" class="w-[18px] h-[18px]" />{siteConfig.phone}
+              </a>
+            </div>
+            <div class="flex flex-wrap gap-3 mt-1.5">
+              <a href={siteConfig.cvUrl} download="Mariam_Gameel_CV.pdf" class="h-12 px-[22px] rounded-full bg-cream text-burgundy font-bold text-sm inline-flex items-center hover:bg-white transition-colors">
+                {t('hero.downloadCv')}
+              </a>
+              <a href={siteConfig.linkedin} target="_blank" rel="noopener noreferrer" class="h-12 px-[22px] rounded-full border-2 border-cream text-cream font-semibold text-sm inline-flex items-center hover:bg-cream/10 transition-colors">LinkedIn</a>
+              <a href={siteConfig.github} target="_blank" rel="noopener noreferrer" class="h-12 px-[22px] rounded-full border-2 border-cream text-cream font-semibold text-sm inline-flex items-center hover:bg-cream/10 transition-colors">GitHub</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
 </BaseLayout>

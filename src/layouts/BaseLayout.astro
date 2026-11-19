@@ -71,7 +71,7 @@ const structuredData = jsonLd || defaultPersonSchema;
 
     <!-- Favicon Set -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="theme-color" content="#0B0B0C" />
+    <meta name="theme-color" content="#6A1220" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content={type} />
@@ -87,21 +87,6 @@ const structuredData = jsonLd || defaultPersonSchema;
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={image} />
 
-    <!-- Anti-flash inline theme script -->
-    <script is:inline>
-      (function () {
-        try {
-          var stored = localStorage.getItem('theme');
-          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          if (stored === 'dark' || (!stored && prefersDark)) {
-            document.documentElement.classList.add('dark');
-          } else {
-            document.documentElement.classList.remove('dark');
-          }
-        } catch (e) {}
-      })();
-    </script>
-
     <!-- Structured Data JSON-LD -->
     <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 
@@ -114,25 +99,17 @@ const structuredData = jsonLd || defaultPersonSchema;
       />
     )}
   </head>
-  <body class="min-h-screen bg-bg text-text-primary antialiased flex flex-col selection:bg-charcoal selection:text-marble-white dark:selection:bg-silver dark:selection:text-ink">
+  <body class="min-h-screen bg-bg text-text-primary antialiased flex flex-col selection:bg-burgundy selection:text-cream">
     <!-- Skip to main content for accessibility -->
     <a href="#main-content" class="skip-link">
       {lang === 'ar' ? 'تخطي إلى المحتوى الرئيسي' : 'Skip to main content'}
     </a>
 
-    <!-- Procedural Marble SVG Filter (Veined Displacement) -->
-    <svg class="sr-only" aria-hidden="true" width="0" height="0">
-      <filter id="marble-vein-filter">
-        <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="4" result="noise" />
-        <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G" />
-      </filter>
-    </svg>
-
     <!-- Header Navigation -->
     <Header lang={lang} currentPath={Astro.url.pathname} />
 
     <!-- Main Content Slot -->
-    <main id="main-content" class="flex-1 w-full max-w-5xl mx-auto px-4 py-8">
+    <main id="main-content" class="flex-1 w-full max-w-[1240px] mx-auto px-4 sm:px-6 py-8 sm:py-10">
       <slot />
     </main>
 
