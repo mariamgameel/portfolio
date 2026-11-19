@@ -16,3 +16,8 @@ Thumbs.db
 *.log
 .vscode/
 .idea/
+
+# Previews and prototypes
+prototype_preview.html
+prototype_full.png
+production_full.png

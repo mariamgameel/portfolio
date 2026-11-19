@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
+import ThreeHero from '../components/ThreeHero.astro';
 import {
   siteConfig,
   technicalStack,
@@ -19,308 +20,618 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = useTranslations(lang);
-const ar = lang === 'ar';
-const L = (en: string, arText: string) => (ar ? arText : en);
+const isAr = lang === 'ar';
+const L = (en: string, arText: string) => (isAr ? arText : en);
 
 // ---- Content ----
-const projects = (await getCollection('projects', ({ data }) => !data.draft))
-  .filter((p) => p.data.featured)
+// Only non-draft featured projects (HRMS & Pediatric Handover; CRM/DevOps omitted)
+const projects = (await getCollection('projects', ({ data }) => !data.draft && data.featured))
   .sort((a, b) => a.data.order - b.data.order);
 
 const experience = (await getCollection('experience')).sort((a, b) => a.data.order - b.data.order);
 
-const months = ar
+const months = isAr
   ? ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
   : ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+
 const fmt = (ym?: string) => {
-  if (!ym) return ar ? 'حتى الآن' : 'PRESENT';
+  if (!ym) return isAr ? 'حتى الآن' : 'PRESENT';
   const [y, m] = ym.split('-');
   return `${months[Number(m) - 1]} ${y}`;
 };
 const period = (start: string, end?: string) =>
-  start === end ? fmt(start) : `${fmt(start)} – ${fmt(end)}`;
-
-const skillGroups = [
-  { label: L('Languages', 'لغات البرمجة'), cat: 'languages' },
-  { label: L('Frontend', 'الواجهات الأمامية'), cat: 'frontend' },
-  { label: L('Backend & Data', 'الخلفية وقواعد البيانات'), cat: 'backend' },
-  { label: L('AI, Cloud & Security', 'الذكاء الاصطناعي والسحابة والأمان'), cat: 'cloud_security' }
-].map((g) => ({ ...g, items: technicalStack.filter((s) => s.category === g.cat).map((s) => s.name) }));
+  start === end ? fmt(start) : `${fmt(start)} — ${fmt(end)}`;
 
 const stats = [
-  { value: experience.length, label: L('internships', 'تدريب عملي') },
-  { value: projects.length, label: L('full-stack projects', 'مشاريع متكاملة') },
-  { value: certificateShowcase.length + additionalCourses.length, label: L('courses & certificates', 'دورة وشهادة') },
-  { value: languagesSpoken.length, label: L('languages', 'لغات') }
+  { value: '02', label: L('Software Internships', 'تدريب برمجي') },
+  { value: '02', label: L('Production Projects', 'مشاريع متكاملة') },
+  { value: '07', label: L('Certificates & Courses', 'شهادات ودورات') },
+  { value: '05', label: L('Languages Spoken', 'لغات معتمدة') }
 ];
 
 const shortLevel = (lvl: string) => lvl.split(' ')[0];
-const arrow = ar ? 'arrow-left' : 'arrow-right';
+const arrow = isAr ? 'arrow-left' : 'arrow-right';
 const contactHref = getLocalizedPath('/contact', lang);
 const certsHref = getLocalizedPath('/certificates', lang);
+const projectsHref = getLocalizedPath('/projects', lang);
 ---
 
-<BaseLayout lang={lang}>
-  <div class="flex flex-col gap-6 sm:gap-10">
-    <!-- ============ HERO ============ -->
-    <section class="bg-sand rounded-[32px] sm:rounded-5xl p-3.5 sm:p-6 pb-6 sm:pb-10 flex flex-col gap-6 sm:gap-9">
-      <div class="relative h-[380px] sm:h-[560px] rounded-[22px] sm:rounded-[30px] overflow-hidden bg-burgundy">
-        <img
-          src={photos.capital}
-          alt={L('Mariam standing in front of a government building in the New Administrative Capital', 'مريم أمام مبنى حكومي في العاصمة الإدارية الجديدة')}
-          class="w-full h-full object-cover [object-position:50%_58%]"
-          fetchpriority="high"
-        />
-        <div class="absolute start-3.5 top-3.5 sm:top-auto sm:start-7 sm:bottom-7 w-28 h-28 sm:w-[220px] sm:h-[220px] bg-burgundy rounded-[22px] sm:rounded-[32px] p-2.5 sm:p-[18px]">
+<BaseLayout lang={lang} fullWidth={true} hideFooter={true}>
+  <!-- ==================== SECTION 1: HERO ==================== -->
+  <section class="relative bg-porcelain pt-16 sm:pt-24 pb-20 sm:pb-28 border-b border-border-light overflow-hidden">
+    <div class="max-w-[1240px] mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-12 lg:gap-16 items-center">
+      <!-- Left Column: Typography & CTAs -->
+      <div class="flex flex-col">
+        <!-- Subheader Eyebrow -->
+        <div class="flex items-center gap-3 text-gold-dark font-mono text-[11px] sm:text-xs font-semibold tracking-[0.22em] uppercase mb-6">
+          <span>{L('Full-Stack Software Engineer · 2026', 'مهندسة برمجيات فل-ستاك · 2026')}</span>
+          <div class="w-12 h-px bg-gold hidden sm:block"></div>
+        </div>
+
+        <!-- Grand Serif Title -->
+        <h1 class="font-serif text-6xl sm:text-7xl lg:text-8xl xl:text-[92px] leading-[0.94] font-normal uppercase tracking-tight text-obsidian mb-7">
+          <span class="block">{isAr ? 'مريم' : 'Mariam'}</span>
+          <span class="block tracking-[0.03em]">{isAr ? 'جميل' : 'Gameel'}</span>
+        </h1>
+
+        <!-- Warm Gold Hairline Divider -->
+        <div class="w-16 h-0.5 bg-gold mb-7"></div>
+
+        <!-- Bio Statement -->
+        <p class="text-base sm:text-[17px] leading-relaxed text-neutral-700 max-w-[540px] mb-9 font-normal">
+          {L(
+            'I engineer scalable, thoughtful full-stack web applications with React, Laravel 12, Node.js, and secure local AI (Ollama LLM) integrations. My foundational background in Psychology brings a rigorous, human-centered lens to architecture, clinician workflows, and interface design.',
+            'أبني تطبيقات ويب متكاملة وقابلة للتوسع باستخدام React وLaravel 12 وNode.js وتكامل الذكاء الاصطناعي المحلي الآمن (Ollama LLM). خلفيتي في علم النفس تضفي منظورًا إنسانيًا دقيقًا على تصميم المعمارية وتجربة المستخدم.'
+          )}
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-wrap items-center gap-5 sm:gap-7">
+          <a
+            href="#work"
+            class="bg-obsidian hover:bg-gold-dark text-porcelain text-xs font-semibold tracking-[0.16em] uppercase px-8 py-4 rounded-sm no-underline inline-flex items-center gap-2.5 transition-all shadow-editorial-sm hover:-translate-y-0.5"
+          >
+            <span>{L('View Work', 'استعراض المشاريع')}</span>
+            <Icon name={arrow} class="w-3.5 h-3.5" />
+          </a>
+          <a
+            href={siteConfig.cvUrl}
+            download="Mariam_Gameel_CV.pdf"
+            class="text-obsidian hover:text-gold-dark text-xs font-semibold tracking-[0.16em] uppercase no-underline inline-flex items-center gap-1.5 border-b border-obsidian hover:border-gold-dark pb-1 transition-colors"
+          >
+            <span>{t('hero.downloadCv')} ↓</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Right Column: Arched Portrait & 3D Interactive Stack -->
+      <div class="relative flex justify-center lg:justify-end items-center mt-6 lg:mt-0">
+        <!-- Arched Portrait Card -->
+        <div class="relative w-[300px] sm:w-[360px] h-[420px] sm:h-[490px] rounded-arch overflow-hidden bg-neutral-200 border-8 border-white shadow-arch-card">
           <img
             src={photos.headshot}
-            alt={L('Professional headshot of Mariam Gameel', 'صورة شخصية مهنية لمريم جميل')}
-            class="w-full h-full object-cover [object-position:50%_25%] rounded-[14px] sm:rounded-[20px]"
+            alt={L('Professional portrait of Mariam Gameel', 'صورة شخصية مهنية لمريم جميل')}
+            class="w-full h-full object-cover [object-position:50%_20%]"
+            fetchpriority="high"
           />
         </div>
-        <div class="absolute start-3.5 end-3.5 bottom-3.5 sm:start-auto sm:end-7 sm:bottom-7 bg-burgundy rounded-[20px] sm:rounded-[28px] p-2 sm:p-3 pe-4 sm:pe-8 flex items-center gap-3 sm:gap-4">
-          <img src={photos.awardRecognition} alt="" class="w-12 h-12 sm:w-[72px] sm:h-[72px] object-cover [object-position:50%_30%] rounded-xl sm:rounded-[18px]" />
-          <div class="flex flex-col gap-0.5 sm:gap-1">
-            <span class="text-cream font-bold text-[15px] sm:text-lg">{L('Mariam Gameel', 'مريم جميل')}</span>
-            <span class="text-latte text-[11px] sm:text-[13px]">{ar ? siteConfig.role_ar : siteConfig.role}</span>
-          </div>
+
+        <!-- Interactive 3D Architectural Stack Component -->
+        <div class="absolute -start-6 sm:-start-12 bottom-6 sm:bottom-10 z-20">
+          <ThreeHero />
+        </div>
+
+        <!-- Circular Embossed Rotating Seal Badge -->
+        <div class="absolute -end-4 sm:-end-6 bottom-16 sm:bottom-20 w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-porcelain border border-gold shadow-editorial-md flex items-center justify-center z-20">
+          <svg viewBox="0 0 100 100" class="w-full h-full animate-rotate-seal">
+            <path id="sealPath" fill="none" stroke="none" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"></path>
+            <text font-family="'Plus Jakarta Sans', sans-serif" font-size="8.2" font-weight="600" letter-spacing="2.2" fill="#BA9B70">
+              <textPath href="#sealPath" startOffset="0%">
+                FULL-STACK ENGINEER · BUILDING WITH CARE ·
+              </textPath>
+            </text>
+          </svg>
+          <span class="absolute font-serif text-2xl font-bold text-gold-dark">M</span>
         </div>
       </div>
+    </div>
+  </section>
 
-      <div class="flex flex-wrap items-center gap-6 sm:gap-x-12 sm:gap-y-8 px-1.5 sm:px-4">
-        <div class="flex justify-between sm:justify-start w-full sm:w-auto gap-5 shrink-0">
-          <img src={photos.awardHolding} alt={L('Mariam holding her ACUD award', 'مريم تحمل جائزة ACUD')} class="w-24 h-24 sm:w-[120px] sm:h-[120px] rounded-full object-cover [object-position:50%_45%]" />
-          <img src={photos.awardRecognition} alt={L('Mariam receiving recognition at ACUD', 'مريم أثناء تكريمها في ACUD')} class="w-24 h-24 sm:w-[120px] sm:h-[120px] rounded-full object-cover [object-position:50%_30%]" />
-          <img src={photos.capital} alt={L('Mariam at the New Administrative Capital', 'مريم في العاصمة الإدارية الجديدة')} class="w-24 h-24 sm:w-[120px] sm:h-[120px] rounded-full object-cover [object-position:50%_30%]" />
+  <!-- ==================== SECTION 2: PROFILE & RECOGNITION ==================== -->
+  <section id="profile" class="bg-[#F5EFEB] py-16 sm:py-24 border-b border-border-light">
+    <div class="max-w-[1240px] mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-[440px_1fr] gap-8 lg:gap-12 items-stretch">
+      <!-- Award Photo Card -->
+      <div class="bg-white border border-border-light rounded-xl p-4 sm:p-5 shadow-editorial-sm flex flex-col gap-4">
+        <div class="rounded-lg overflow-hidden h-[340px] sm:h-[380px] bg-neutral-100">
+          <img
+            src={photos.awardRecognition}
+            alt={L('Mariam Gameel receiving Software Engineering Shield at ACUD', 'مريم جميل أثناء تكريمها في شركة العاصمة الإدارية للتنمية العمرانية')}
+            class="w-full h-full object-cover [object-position:50%_30%]"
+            loading="lazy"
+          />
         </div>
-        <div class="flex-[1_1_420px] flex flex-col gap-3">
-          <h1 class="m-0 text-2xl sm:text-[34px] font-bold text-burgundy leading-tight">
-            {ar ? siteConfig.name_ar : siteConfig.name}
-          </h1>
-          <p class="m-0 text-[13px] sm:text-[15px] leading-relaxed text-cocoa max-w-[680px]">
+        <div class="flex items-start gap-3 text-xs sm:text-sm text-neutral-600 leading-relaxed">
+          <span class="font-mono text-[10px] font-semibold tracking-wider text-gold-dark bg-[#F0E8DD] px-2 py-0.5 rounded uppercase shrink-0">
+            {L('RECOGNITION', 'تكريم')}
+          </span>
+          <span>
             {L(
-              'Junior Software Engineer building full-stack products with JavaScript, React, PHP, Laravel, Node.js and Express. I design RESTful APIs, work across relational and NoSQL databases, and integrate local LLMs into real applications. My background in Psychology brings a human-centred lens to every interface I build.',
-              'مهندسة برمجيات مبتدئة أبني منتجات متكاملة باستخدام JavaScript وReact وPHP وLaravel وNode.js وExpress. أصمم واجهات RESTful، وأعمل مع قواعد البيانات العلائقية وNoSQL، وأدمج نماذج اللغة المحلية في تطبيقات حقيقية. خلفيتي في علم النفس تضيف منظورًا إنسانيًا لكل واجهة أبنيها.'
+              'Awarded the Software Engineering Excellence Shield by leadership at the Administrative Capital for Urban Development (ACUD) for AI HRMS contributions.',
+              'حصلت على درع التميز في هندسة البرمجيات من قيادات شركة العاصمة الإدارية للتنمية العمرانية تقديرًا للمساهمة في منصة إدارة الموارد البشرية بالذكاء الاصطناعي.'
             )}
-          </p>
-          <div class="flex flex-wrap gap-3 mt-1.5">
-            <a href={siteConfig.cvUrl} download="Mariam_Gameel_CV.pdf" class="h-12 px-6 rounded-full bg-burgundy text-cream font-semibold text-sm inline-flex items-center gap-2.5 hover:bg-burgundy-dark transition-colors">
-              <Icon name="download" class="w-[18px] h-[18px]" />
-              {t('hero.downloadCv')}
-            </a>
-            <a href="#certificates" class="h-12 px-6 rounded-full border-2 border-burgundy text-burgundy font-semibold text-sm inline-flex items-center hover:bg-burgundy hover:text-cream transition-colors">
-              {L('View certificates', 'عرض الشهادات')}
-            </a>
-          </div>
+          </span>
         </div>
       </div>
-    </section>
 
-    <!-- ============ PROFILE ROW ============ -->
-    <section class="flex flex-wrap gap-3 sm:gap-6">
-      <div class="flex-[1_1_440px] bg-sand rounded-[24px] sm:rounded-4xl p-2 sm:p-4 flex min-h-[260px] sm:min-h-[520px]">
-        <img
-          src={photos.awardRecognition}
-          alt={L('Mariam with her award at the Administrative Capital for Urban Development', 'مريم مع جائزتها في شركة العاصمة الإدارية للتنمية العمرانية')}
-          class="w-full object-cover [object-position:50%_35%] rounded-[18px] sm:rounded-3xl"
-          loading="lazy"
-        />
-      </div>
-      <div class="flex-[1.2_1_520px] bg-burgundy rounded-[24px] sm:rounded-4xl p-2 sm:p-5 flex flex-col justify-between gap-3 sm:gap-7">
-        <div class="bg-sand rounded-[18px] sm:rounded-[26px] p-5 sm:p-8 flex flex-col gap-5 sm:gap-6">
-          <div class="flex flex-col gap-1.5">
-            <h2 class="m-0 text-2xl sm:text-[32px] font-bold text-wine">{L('Mariam Gameel', 'مريم جميل')}</h2>
-            <span class="text-base text-cocoa">{L('Junior Full-Stack Software Engineer', 'مهندسة برمجيات فل-ستاك مبتدئة')}</span>
-          </div>
-          <a href={siteConfig.github} target="_blank" rel="noopener noreferrer" class="self-start font-bold text-lg sm:text-xl text-wine inline-flex items-center gap-2 no-underline hover:underline" dir="ltr">
-            <Icon name="github" class="w-5 h-5" />
-            mariamgameel
+      <!-- Profile Details & Quick Stats -->
+      <div class="bg-white border border-border-light rounded-xl p-6 sm:p-10 flex flex-col justify-between gap-8 shadow-editorial-sm">
+        <div>
+          <h2 class="font-serif text-3xl sm:text-4xl font-semibold text-obsidian mb-2">
+            {isAr ? siteConfig.name_ar : siteConfig.name}
+          </h2>
+          <span class="block text-xs sm:text-sm font-semibold text-gold-dark uppercase tracking-wider mb-4">
+            {isAr ? siteConfig.role_ar : 'Full-Stack Software Engineer & AI Builder'}
+          </span>
+          <a
+            href={siteConfig.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 font-mono text-xs sm:text-sm text-obsidian hover:text-gold-dark border-b border-border-light pb-1 mb-8 no-underline transition-colors"
+            dir="ltr"
+          >
+            <Icon name="github" class="w-4 h-4" />
+            <span>github.com/mariamgameel</span>
           </a>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+
+          <!-- Stats Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 py-6 border-y border-border-light">
             {stats.map((s) => (
-              <div class="flex flex-col gap-0.5">
-                <span class="text-[26px] font-bold text-wine">{s.value}</span>
-                <span class="text-xs text-cocoa">{s.label}</span>
+              <div class="flex flex-col gap-1">
+                <span class="font-serif text-3xl sm:text-4xl font-bold text-obsidian">{s.value}</span>
+                <span class="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider leading-snug">{s.label}</span>
               </div>
             ))}
           </div>
-          <p class="m-0 text-sm leading-relaxed text-cocoa">{ar ? education.ar : education.en}</p>
         </div>
-        <div class="flex flex-wrap gap-3">
-          <a href={siteConfig.cvUrl} download="Mariam_Gameel_CV.pdf" class="flex-[1_1_160px] h-[52px] rounded-[14px] bg-cream text-burgundy font-bold text-sm flex items-center justify-center hover:bg-white transition-colors">
-            {t('hero.downloadCv')}
-          </a>
-          <a href={contactHref} class="flex-[1_1_160px] h-[52px] rounded-[14px] bg-cream text-burgundy font-bold text-sm flex items-center justify-center hover:bg-white transition-colors">
-            {L('Contact me', 'تواصل معي')}
-          </a>
-          <a href={siteConfig.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="w-[52px] h-[52px] shrink-0 rounded-[14px] bg-cream text-burgundy flex items-center justify-center hover:bg-white transition-colors">
-            <Icon name="linkedin" class="w-5 h-5" />
-          </a>
-        </div>
-      </div>
-    </section>
 
-    <!-- ============ EXPERIENCE + SKILLS ============ -->
-    <section id="experience" class="flex flex-wrap gap-3 sm:gap-6 scroll-mt-28">
-      <div class="flex-[1.3_1_520px] bg-sand rounded-[28px] sm:rounded-4xl p-6 sm:p-9 flex flex-col gap-5 sm:gap-6">
-        <h2 class="m-0 text-xl sm:text-[26px] font-bold text-burgundy">{L('Experience', 'الخبرة العملية')}</h2>
-        {experience.map((job, i) => (
-          <>
-            {i > 0 && <div class="h-px bg-divider" />}
-            <div class="flex gap-5">
-              <div class={`w-3.5 h-3.5 rounded-full mt-1 shrink-0 ${i === 0 ? 'bg-burgundy' : 'border-[3px] border-burgundy'}`} />
-              <div class="flex flex-col gap-1.5">
-                <span class="text-[11px] sm:text-xs font-semibold tracking-[0.06em] text-burgundy">
-                  {period(job.data.start, job.data.end)}
-                </span>
-                <span class="text-[15px] sm:text-lg font-bold text-wine">
-                  {ar ? job.data.role_ar ?? job.data.role : job.data.role} — {ar ? job.data.org_ar ?? job.data.org : job.data.org}
-                </span>
-                <span class="text-[13px] sm:text-sm leading-relaxed text-cocoa">
-                  {ar ? job.data.summary_ar ?? job.data.summary : job.data.summary}
-                </span>
-              </div>
-            </div>
-          </>
-        ))}
-      </div>
-
-      <div class="flex-[1_1_420px] bg-burgundy rounded-[28px] sm:rounded-4xl p-6 sm:p-9 flex flex-col gap-5 text-cream">
-        <h2 class="m-0 text-xl sm:text-[26px] font-bold">{L('Skills', 'المهارات')}</h2>
-        {skillGroups.map((g) => (
-          <div class="flex flex-col gap-2.5">
-            <span class="text-xs font-semibold tracking-[0.08em] text-latte uppercase">{g.label}</span>
-            <div class="flex flex-wrap gap-2">
-              {g.items.map((s) => (
-                <span class="bg-sand text-burgundy-dark rounded-full px-3.5 py-1.5 text-[13px] font-semibold" dir="ltr">{s}</span>
-              ))}
-            </div>
+        <!-- Academic Foundations Box -->
+        <div class="bg-porcelain border border-border-light rounded-lg p-5">
+          <div class="font-mono text-[11px] font-semibold text-gold-dark uppercase tracking-widest mb-2">
+            {L('ACADEMIC FOUNDATIONS', 'الخلفية الأكاديمية')}
           </div>
-        ))}
-      </div>
-    </section>
+          <p class="text-xs sm:text-[13.5px] leading-relaxed text-neutral-700 m-0">
+            {isAr ? education.ar : education.en}
+          </p>
+        </div>
 
-    <!-- ============ PROJECTS ============ -->
-    <section id="projects" class="bg-sand rounded-[28px] sm:rounded-5xl p-3.5 sm:p-6 flex flex-col gap-4 sm:gap-6 scroll-mt-28">
-      <div class="pill-header">
-        <span class="pill-icon"><Icon name="code" class="w-[18px] h-[18px]" /></span>
-        <h2 class="m-0 text-[15px] sm:text-[17px] font-bold flex-1">{t('nav.projects')}</h2>
-        <a href={getLocalizedPath('/projects', lang)} aria-label={t('projects.viewAll')} class="text-[13px] text-latte hover:text-cream inline-flex items-center gap-1.5 shrink-0 min-h-11 px-1">
-          <span class="hidden sm:inline">{t('projects.viewAll')}</span>
-          <Icon name={arrow} class="w-4 h-4" />
+        <!-- Quick Links -->
+        <div class="flex flex-wrap items-center gap-4 pt-2">
+          <a
+            href={siteConfig.cvUrl}
+            download="Mariam_Gameel_CV.pdf"
+            class="bg-obsidian hover:bg-gold-dark text-porcelain text-xs font-semibold tracking-wider uppercase px-5 py-3 rounded-sm no-underline inline-flex items-center gap-2 transition-colors"
+          >
+            <Icon name="download" class="w-3.5 h-3.5" />
+            <span>{t('hero.downloadCv')}</span>
+          </a>
+          <a
+            href={contactHref}
+            class="border border-obsidian hover:border-gold-dark hover:text-gold-dark text-obsidian text-xs font-semibold tracking-wider uppercase px-5 py-3 rounded-sm no-underline transition-colors"
+          >
+            {L('Contact Me', 'تواصل معي')}
+          </a>
+          <a
+            href={siteConfig.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="w-10 h-10 border border-border-light hover:border-gold text-obsidian hover:text-gold-dark flex items-center justify-center rounded-sm transition-colors"
+            aria-label="LinkedIn"
+          >
+            <Icon name="linkedin" class="w-4 h-4" />
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SECTION 3: SELECTED WORKS (OBSIDIAN DARK) ==================== -->
+  <section id="work" class="bg-obsidian text-neutral-200 py-20 sm:py-28 border-b border-border-dark scroll-mt-12">
+    <div class="max-w-[1240px] mx-auto px-4 sm:px-8">
+      <!-- Section Header -->
+      <div class="flex items-center justify-between pb-6 mb-12 sm:mb-16 border-b border-border-dark">
+        <div class="flex items-center gap-4 sm:gap-6">
+          <span class="font-mono text-xs font-semibold tracking-[0.22em] text-gold uppercase">
+            {L('SELECTED WORKS', 'أبرز الأعمال')}
+          </span>
+          <div class="w-20 sm:w-36 h-px bg-border-dark"></div>
+        </div>
+        <a
+          href={projectsHref}
+          class="font-mono text-xs font-semibold tracking-[0.16em] text-neutral-400 hover:text-gold uppercase no-underline inline-flex items-center gap-1.5 transition-colors"
+        >
+          <span>{L('VIEW ALL PROJECTS', 'عرض كافة المشاريع')}</span>
+          <Icon name={arrow} class="w-3.5 h-3.5" />
         </a>
       </div>
-      <div class="flex flex-wrap gap-3 sm:gap-6">
+
+      <!-- Projects Grid: ONLY HRMS & Pediatric Handover (CRM/DevOps omitted) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
         {projects.map((p, i) => {
-          const dark = i % 2 === 1;
+          const num = `0${i + 1}`;
+          const isHrms = p.slug.includes('hrms');
           return (
-            <a
-              href={getLocalizedPath(`/projects/${p.slug}`, lang)}
-              class={`group flex-[1_1_460px] rounded-[24px] sm:rounded-[28px] p-6 sm:p-8 flex flex-col gap-3 sm:gap-4 no-underline transition-transform hover:-translate-y-0.5 ${
-                dark ? 'bg-burgundy' : 'bg-cream'
-              }`}
-            >
-              <span class={`text-[11px] sm:text-xs font-semibold tracking-[0.08em] uppercase ${dark ? 'text-latte' : 'text-burgundy'}`}>
-                {p.data.category.join(' · ')}
-              </span>
-              <h3 class={`m-0 text-[17px] sm:text-[22px] font-bold ${dark ? 'text-cream' : 'text-wine'}`}>
-                {ar ? p.data.title_ar ?? p.data.title : p.data.title}
-              </h3>
-              <p class={`m-0 text-[13px] sm:text-sm leading-relaxed ${dark ? 'text-blush' : 'text-cocoa'}`}>
-                {ar ? p.data.summary_ar ?? p.data.summary : p.data.summary}
-              </p>
-              <div class="flex flex-wrap gap-2 mt-auto pt-1" dir="ltr">
-                {p.data.tech.slice(0, 6).map((tech) => (
-                  <span class={`rounded-full px-3 py-1 text-xs font-semibold border-[1.5px] ${dark ? 'border-latte text-cream' : 'border-burgundy text-burgundy'}`}>
-                    {tech}
+            <article class="relative bg-obsidian-card border border-border-dark hover:border-gold rounded-lg p-7 sm:p-9 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 group">
+              <!-- Top hairline gold accent -->
+              <div class="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-gold via-gold/40 to-transparent w-16"></div>
+
+              <div>
+                <div class="flex items-center justify-between mb-5">
+                  <span class="font-mono text-sm font-semibold text-gold">{num}</span>
+                  <span class="font-mono text-[10px] tracking-wider text-neutral-400 border border-border-dark px-2.5 py-0.5 rounded uppercase">
+                    {p.data.category.join(' / ')}
                   </span>
-                ))}
+                </div>
+
+                <h3 class="font-serif text-2xl sm:text-3xl font-semibold text-neutral-100 mb-2 leading-snug">
+                  {isAr ? p.data.title_ar ?? p.data.title : p.data.title}
+                </h3>
+
+                <div class="font-mono text-[11px] tracking-wider text-gold-light uppercase mb-4">
+                  {isHrms
+                    ? L('ACUD AI Capstone · Software Engineering Shield', 'مشروع تخرج ACUD · درع التميز البرمجي')
+                    : L('Clinical Ward Shift Handover Engine', 'محرك تسليم النوبات السريرية')}
+                </div>
+
+                <p class="text-xs sm:text-sm leading-relaxed text-neutral-300 mb-6">
+                  {isAr ? p.data.summary_ar ?? p.data.summary : p.data.summary}
+                </p>
+
+                <!-- Architectural Terminal/Code Preview -->
+                <div class="bg-obsidian-inner border border-neutral-800 rounded p-4 font-mono text-[11px] text-neutral-400 mb-6">
+                  {isHrms ? (
+                    <>
+                      <div class="flex items-center gap-2 mb-1.5"><span class="text-gold">&gt;</span> <span class="text-neutral-300">POST /api/v1/interviews/evaluate</span></div>
+                      <div class="flex items-center gap-2 mb-1.5"><span class="text-gold">&gt;</span> <span class="text-neutral-500">Sanctum::tokenCan('candidates:evaluate')</span></div>
+                      <div class="flex items-center gap-2"><span class="text-gold">&gt;</span> <span class="text-neutral-300">Ollama::chat(['model' =&gt; 'mistral-hrms'])</span></div>
+                    </>
+                  ) : (
+                    <>
+                      <div class="flex items-center gap-2 mb-1.5"><span class="text-gold">&gt;</span> <span class="text-neutral-300">PUT /api/v1/patients/:id/handover</span></div>
+                      <div class="flex items-center gap-2 mb-1.5"><span class="text-gold">&gt;</span> <span class="text-neutral-500">verifyRole(['attending', 'resident'])</span></div>
+                      <div class="flex items-center gap-2"><span class="text-gold">&gt;</span> <span class="text-neutral-300">AuditLog.commitHandoverSession(tx)</span></div>
+                    </>
+                  )}
+                </div>
+
+                <!-- Tech Tags -->
+                <div class="flex flex-wrap gap-2 mb-6" dir="ltr">
+                  {p.data.tech.slice(0, 6).map((tech) => (
+                    <span class="font-mono text-[11px] text-neutral-300 bg-neutral-900 border border-neutral-800 px-2.5 py-1 rounded">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <span class={`inline-flex items-center gap-1.5 text-sm font-bold ${dark ? 'text-cream' : 'text-burgundy'}`}>
-                {t('projects.inspect')}
-                <Icon name={arrow} class="w-4 h-4 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
-              </span>
-            </a>
+
+              <!-- Footer CTA -->
+              <div class="pt-5 border-t border-border-dark flex items-center justify-between">
+                <a
+                  href={getLocalizedPath(`/projects/${p.slug}`, lang)}
+                  class="text-xs font-semibold tracking-wider text-neutral-100 group-hover:text-gold uppercase inline-flex items-center gap-2 no-underline transition-colors"
+                >
+                  <span>{L('Inspect Architecture', 'فحص المعمارية')}</span>
+                  <Icon name={arrow} class="w-3.5 h-3.5 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
+                </a>
+                <span class="font-mono text-[11px] text-neutral-500">
+                  {p.data.status}
+                </span>
+              </div>
+            </article>
           );
         })}
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ============ CERTIFICATES ============ -->
-    <section id="certificates" class="bg-sand rounded-[28px] sm:rounded-5xl p-3.5 sm:p-6 sm:pb-9 flex flex-col gap-4 sm:gap-6 scroll-mt-28">
-      <div class="pill-header">
-        <span class="pill-icon"><Icon name="award" class="w-[18px] h-[18px]" /></span>
-        <h2 class="m-0 text-[15px] sm:text-[17px] font-bold flex-1">{t('nav.certificates')}</h2>
-        <a href={certsHref} aria-label={t('certificates.viewAll')} class="text-[13px] text-latte hover:text-cream inline-flex items-center gap-1.5 shrink-0 min-h-11 px-1">
-          <span class="hidden sm:inline">{t('certificates.viewAll')}</span>
-          <Icon name={arrow} class="w-4 h-4" />
+  <!-- ==================== SECTION 4: EXPERIENCE & STACK ==================== -->
+  <section id="experience" class="bg-porcelain py-20 sm:py-28 border-b border-border-light scroll-mt-12">
+    <div class="max-w-[1240px] mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16">
+      <!-- Left Column: Work Experience Timeline -->
+      <div>
+        <div class="flex items-center justify-between pb-4 mb-8 border-b border-border-light">
+          <h2 class="font-serif text-2xl sm:text-3xl font-semibold text-obsidian m-0">
+            {L('Work Experience', 'الخبرات العملية')}
+          </h2>
+          <span class="font-mono text-[11px] font-semibold text-gold-dark uppercase tracking-widest">
+            {L('ENGINEERING TRACK', 'المسار الهندسي')}
+          </span>
+        </div>
+
+        <div class="flex flex-col gap-9">
+          {experience.map((job, idx) => (
+            <div class="flex gap-5">
+              <div class="flex flex-col items-center">
+                <div class={`w-3 h-3 rounded-full mt-1.5 shrink-0 ${idx === 0 ? 'bg-gold ring-4 ring-[#EFE9DE]' : 'bg-obsidian'}`}></div>
+                {idx < experience.length - 1 && <div class="w-px flex-1 bg-border-light my-2"></div>}
+              </div>
+              <div class="flex flex-col gap-1.5 pb-2">
+                <span class="font-mono text-[11px] font-semibold tracking-wider text-gold-dark uppercase">
+                  {period(job.data.start, job.data.end)}
+                </span>
+                <h3 class="font-serif text-xl sm:text-2xl font-semibold text-obsidian m-0">
+                  {isAr ? job.data.role_ar ?? job.data.role : job.data.role}
+                </h3>
+                <span class="text-xs sm:text-sm font-semibold text-neutral-700">
+                  {isAr ? job.data.org_ar ?? job.data.org : job.data.org}
+                </span>
+                <p class="text-xs sm:text-sm leading-relaxed text-neutral-600 m-0 mt-1">
+                  {isAr ? job.data.summary_ar ?? job.data.summary : job.data.summary}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Right Column: Technical Stack Table & How I Build -->
+      <div>
+        <div class="flex items-center justify-between pb-4 mb-8 border-b border-border-light">
+          <h2 class="font-serif text-2xl sm:text-3xl font-semibold text-obsidian m-0">
+            {L('Technical Stack', 'المهارات التقنية')}
+          </h2>
+          <span class="font-mono text-[11px] font-semibold text-gold-dark uppercase tracking-widest">
+            {L('CORE CAPABILITIES', 'القدرات الأساسية')}
+          </span>
+        </div>
+
+        <!-- Stack Table -->
+        <table class="w-full border-collapse mb-10 text-xs sm:text-sm">
+          <tbody>
+            <tr class="border-b border-border-light">
+              <td class="py-3.5 pe-4 font-mono text-[11px] font-semibold uppercase tracking-wider text-gold-dark w-28 sm:w-36 align-top">
+                Frontend
+              </td>
+              <td class="py-3.5 text-neutral-800 font-medium leading-relaxed">
+                React, Tailwind CSS, Bootstrap, HTML5, CSS3, Responsive Design
+              </td>
+            </tr>
+            <tr class="border-b border-border-light">
+              <td class="py-3.5 pe-4 font-mono text-[11px] font-semibold uppercase tracking-wider text-gold-dark w-28 sm:w-36 align-top">
+                Backend
+              </td>
+              <td class="py-3.5 text-neutral-800 font-medium leading-relaxed">
+                Node.js, Express.js, PHP 8.x, Laravel 12, RESTful APIs, MVC Architecture
+              </td>
+            </tr>
+            <tr class="border-b border-border-light">
+              <td class="py-3.5 pe-4 font-mono text-[11px] font-semibold uppercase tracking-wider text-gold-dark w-28 sm:w-36 align-top">
+                Data &amp; ORM
+              </td>
+              <td class="py-3.5 text-neutral-800 font-medium leading-relaxed">
+                MySQL, PostgreSQL, MongoDB, Eloquent ORM, Mongoose
+              </td>
+            </tr>
+            <tr class="border-b border-border-light">
+              <td class="py-3.5 pe-4 font-mono text-[11px] font-semibold uppercase tracking-wider text-gold-dark w-28 sm:w-36 align-top">
+                Cloud &amp; AI
+              </td>
+              <td class="py-3.5 text-neutral-800 font-medium leading-relaxed">
+                AWS Cloud (2x Certified), Ollama Local LLMs, Docker, Git, CI/CD, RBAC
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- How I Build Methodology (Reference Match) -->
+        <div class="bg-[#F3ECE2] border border-border-light rounded-lg p-6 sm:p-7">
+          <div class="font-mono text-[11px] font-semibold text-gold-dark uppercase tracking-widest mb-5">
+            {L('HOW I BUILD SOFTWARE', 'منهجية البناء البرمجي')}
+          </div>
+          <div class="flex flex-col gap-4">
+            <div class="flex items-baseline gap-4">
+              <span class="font-serif text-lg font-bold text-gold-dark w-6 shrink-0">01</span>
+              <div>
+                <span class="text-xs sm:text-sm font-semibold text-obsidian block">
+                  {L('Understand the People', 'فهم المستخدمين والاحتياجات')}
+                </span>
+                <span class="text-[11px] sm:text-xs text-neutral-600 block mt-0.5">
+                  {L('Psychology-informed user workflows, reducing cognitive friction and mental fatigue.', 'تصميم مسارات العمل استنادًا إلى علم النفس لتقليل العبء المعرفي.')}
+                </span>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-4">
+              <span class="font-serif text-lg font-bold text-gold-dark w-6 shrink-0">02</span>
+              <div>
+                <span class="text-xs sm:text-sm font-semibold text-obsidian block">
+                  {L('Design the Architecture', 'تصميم المعمارية البرمجية')}
+                </span>
+                <span class="text-[11px] sm:text-xs text-neutral-600 block mt-0.5">
+                  {L('Clean API contracts, secure boundaries, and relational/document database schemas.', 'عقود واجهات برمجة واضحة وفصل مرن بين الطبقات ونماذج بيانات محكمة.')}
+                </span>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-4">
+              <span class="font-serif text-lg font-bold text-gold-dark w-6 shrink-0">03</span>
+              <div>
+                <span class="text-xs sm:text-sm font-semibold text-obsidian block">
+                  {L('Build with Care', 'البناء بعناية وأمان')}
+                </span>
+                <span class="text-[11px] sm:text-xs text-neutral-600 block mt-0.5">
+                  {L('Strict schema validation, OWASP defenses, and privacy-first local AI processing.', 'التحقق الدقيق من المدخلات، حماية أمنية مشددة، ومعالجة ذكاء اصطناعي محلي.')}
+                </span>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-4">
+              <span class="font-serif text-lg font-bold text-gold-dark w-6 shrink-0">04</span>
+              <div>
+                <span class="text-xs sm:text-sm font-semibold text-obsidian block">
+                  {L('Deploy and Monitor', 'النشر والمراقبة')}
+                </span>
+                <span class="text-[11px] sm:text-xs text-neutral-600 block mt-0.5">
+                  {L('Containerized environments and verifiable AWS cloud infrastructure.', 'بيئات عمل معزولة بالحاويات وممارسات موثقة على سحابة AWS.')}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SECTION 5: CERTIFICATES SHOWCASE ==================== -->
+  <section id="certificates" class="bg-[#F4EFE9] py-20 sm:py-28 border-b border-border-light scroll-mt-12">
+    <div class="max-w-[1240px] mx-auto px-4 sm:px-8">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between pb-5 mb-10 border-b border-border-light gap-3">
+        <div>
+          <div class="font-mono text-[11px] font-semibold text-gold-dark uppercase tracking-widest mb-1.5">
+            {L('VERIFIED EXPERTISE', 'شهادات معتمدة')}
+          </div>
+          <h2 class="font-serif text-3xl sm:text-4xl font-semibold text-obsidian m-0">
+            {L('Certifications & Professional Badges', 'الشهادات والاعتمادات المهنية')}
+          </h2>
+        </div>
+        <a
+          href={certsHref}
+          class="font-mono text-xs font-semibold text-gold-dark hover:text-obsidian uppercase tracking-wider no-underline inline-flex items-center gap-1.5 transition-colors"
+        >
+          <span>{L('VIEW ALL CERTIFICATES', 'عرض كافة الشهادات')}</span>
+          <Icon name={arrow} class="w-3.5 h-3.5" />
         </a>
       </div>
-      <div class="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-5">
+
+      <!-- Scanned Certificate Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
         {certificateShowcase.map((c) => (
-          <figure class="m-0 bg-cream rounded-2xl sm:rounded-3xl p-1.5 sm:p-3 flex flex-col gap-1.5 sm:gap-3">
-            <img src={c.img} alt={c.alt} loading="lazy" class="w-full aspect-[660/510] object-cover rounded-[10px] sm:rounded-[14px] bg-white" />
-            <figcaption class="flex flex-col gap-0.5 px-1 sm:px-1.5 pb-1 sm:pb-1.5" dir="ltr">
-              <span class="text-[11px] sm:text-[15px] font-bold text-wine leading-snug">{c.title}</span>
-              <span class="hidden sm:block text-xs text-burgundy font-semibold">{c.meta}</span>
+          <figure class="m-0 bg-white border border-border-light rounded-lg overflow-hidden flex flex-col shadow-editorial-sm hover:-translate-y-1 hover:shadow-editorial-md transition-all">
+            <div class="h-44 sm:h-48 bg-[#FDFBF8] border-b border-border-light p-3 flex items-center justify-center">
+              <img
+                src={c.img}
+                alt={c.alt}
+                loading="lazy"
+                class="max-w-full max-h-full object-contain"
+              />
+            </div>
+            <figcaption class="p-4 sm:p-5 flex flex-col gap-1">
+              <span class="font-mono text-[10px] font-semibold text-gold-dark uppercase tracking-wider">
+                {c.meta.split('·')[0]}
+              </span>
+              <h3 class="font-serif text-lg font-semibold text-obsidian leading-snug m-0">
+                {c.title}
+              </h3>
+              <span class="text-xs text-neutral-500 mt-1">
+                {c.meta}
+              </span>
             </figcaption>
           </figure>
         ))}
       </div>
-      <div class="flex flex-col gap-3 px-2">
-        <span class="text-xs font-semibold tracking-[0.08em] text-burgundy">{L('ALSO COMPLETED', 'دورات أخرى مكتملة')}</span>
+
+      <!-- Extra Completed Courses Strip -->
+      <div class="bg-[#EBE4DA] rounded-lg p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <span class="font-mono text-[11px] font-bold uppercase tracking-wider text-obsidian shrink-0">
+          {L('ALSO COMPLETED:', 'دورات معتمدة أخرى:')}
+        </span>
         <div class="flex flex-wrap gap-2" dir="ltr">
-          {additionalCourses.map((name) => (
-            <span class="bg-cream text-burgundy-dark rounded-full px-3.5 py-2 text-[13px] font-medium">{name}</span>
+          {additionalCourses.map((course) => (
+            <span class="bg-white text-neutral-800 border border-[#DFD7CA] text-xs font-medium px-3.5 py-1.5 rounded-full shadow-2xs">
+              {course}
+            </span>
           ))}
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ============ CONTACT ============ -->
-    <section id="contact" class="flex flex-wrap gap-3 sm:gap-6 items-stretch scroll-mt-28">
-      <div class="flex-[1_1_420px] bg-sand rounded-[28px] sm:rounded-4xl px-6 sm:px-8 py-8 sm:py-10 flex flex-col items-center justify-center gap-3.5">
-        <div class="w-[132px] h-[132px] rounded-full border-[5px] border-burgundy p-1">
-          <img src={photos.headshot} alt={siteConfig.name} class="w-full h-full rounded-full object-cover [object-position:50%_25%]" loading="lazy" />
-        </div>
-        <span class="text-xl font-semibold text-burgundy" dir="ltr">@mariamgameel</span>
-        <div class="flex flex-wrap justify-center gap-x-9 gap-y-4 mt-1.5">
-          {languagesSpoken.map((l) => (
-            <div class="flex flex-col items-center gap-0.5">
-              <span class="text-xl font-bold text-burgundy">{ar ? l.level_ar : shortLevel(l.level)}</span>
-              <span class="text-[13px] text-cocoa">{ar ? l.name_ar : l.name}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+  <!-- ==================== SECTION 6: CONTACT & LET'S BUILD SOMETHING (DARK HERO FOOTER) ==================== -->
+  <section id="contact" class="bg-obsidian text-neutral-200 pt-20 sm:pt-28 pb-10 scroll-mt-12">
+    <div class="max-w-[1240px] mx-auto px-4 sm:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-12 lg:gap-16 mb-16 sm:mb-20">
+        <!-- Left: Editorial Headline & Contact Channels -->
+        <div>
+          <h2 class="font-serif text-4xl sm:text-6xl lg:text-[68px] leading-[1.05] font-normal text-porcelain mb-6">
+            <span>{L('Let’s build something', 'لنبنِ شيئًا')}</span><br />
+            <em class="italic text-gold-light">{L('thoughtful.', 'متميزًا وهادفًا.')}</em>
+          </h2>
 
-      <div class="flex-[1.2_1_480px] bg-burgundy rounded-[28px] sm:rounded-4xl p-3 sm:p-[18px] flex">
-        <div class="relative flex-1 rounded-[20px] sm:rounded-3xl overflow-hidden min-h-[420px] flex">
-          <img src={photos.capital} alt="" class="absolute inset-0 w-full h-full object-cover [object-position:50%_20%]" loading="lazy" />
-          <div class="absolute inset-0 bg-wine/60" />
-          <div class="relative flex-1 p-6 sm:p-9 flex flex-col justify-end gap-4 sm:gap-[18px] text-cream">
-            <h2 class="m-0 text-[28px] sm:text-4xl font-bold">{L('Let’s build something.', 'لنبنِ شيئًا معًا.')}</h2>
-            <p class="m-0 text-[15px] leading-relaxed text-blush max-w-[440px]">
-              {L('Open to junior full-stack and software-engineering roles, internships and freelance projects.', 'متاحة لوظائف هندسة البرمجيات والتطوير المتكامل للمبتدئين، والتدريب، والمشاريع المستقلة.')}
-            </p>
-            <div class="flex flex-col gap-2.5 text-[15px]" dir="ltr">
-              <a href={`mailto:${siteConfig.email}`} class="text-cream no-underline hover:underline inline-flex items-center gap-2.5 self-start">
-                <Icon name="mail" class="w-[18px] h-[18px]" />{siteConfig.email}
-              </a>
-              <a href={`tel:${siteConfig.phone.replace(/[^+\d]/g, '')}`} class="text-cream no-underline hover:underline inline-flex items-center gap-2.5 self-start">
-                <Icon name="phone" class="w-[18px] h-[18px]" />{siteConfig.phone}
-              </a>
+          <p class="text-sm sm:text-base leading-relaxed text-neutral-300 max-w-[520px] mb-8">
+            {L(
+              'Available for full-stack engineering roles, software engineering internships, and high-impact freelance projects. Let’s discuss how human-centered architectures and modern engineering can bring your next product to life.',
+              'متاحة لوظائف هندسة البرمجيات والتطوير المتكامل، والتدريب العملي، والمشاريع البرمجية المتميزة. لنتناقش حول كيفية تحويل فكرتكم إلى منتج حقيقي.'
+            )}
+          </p>
+
+          <div class="flex flex-col gap-4 text-sm sm:text-[15px]" dir="ltr">
+            <a
+              href={`mailto:${siteConfig.email}`}
+              class="text-neutral-200 hover:text-gold inline-flex items-center gap-3 no-underline transition-colors self-start"
+            >
+              <Icon name="mail" class="w-4 h-4 text-gold" />
+              <span>{siteConfig.email}</span>
+            </a>
+            <a
+              href={`tel:${siteConfig.phone.replace(/[^+\d]/g, '')}`}
+              class="text-neutral-200 hover:text-gold inline-flex items-center gap-3 no-underline transition-colors self-start"
+            >
+              <Icon name="phone" class="w-4 h-4 text-gold" />
+              <span>{siteConfig.phone}</span>
+            </a>
+            <a
+              href={siteConfig.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-neutral-200 hover:text-gold inline-flex items-center gap-3 no-underline transition-colors self-start"
+            >
+              <Icon name="linkedin" class="w-4 h-4 text-gold" />
+              <span>linkedin.com/in/mariam-gameel</span>
+            </a>
+            <a
+              href={siteConfig.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-neutral-200 hover:text-gold inline-flex items-center gap-3 no-underline transition-colors self-start"
+            >
+              <Icon name="github" class="w-4 h-4 text-gold" />
+              <span>github.com/mariamgameel</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Column: Languages Spoken & Monogram -->
+        <div class="bg-obsidian-card border border-border-dark rounded-xl p-7 sm:p-9 flex flex-col justify-between gap-8">
+          <div>
+            <div class="font-mono text-xs font-semibold tracking-[0.2em] uppercase text-gold mb-6">
+              {L('LANGUAGES SPOKEN', 'اللغات')}
             </div>
-            <div class="flex flex-wrap gap-3 mt-1.5">
-              <a href={siteConfig.cvUrl} download="Mariam_Gameel_CV.pdf" class="h-12 px-[22px] rounded-full bg-cream text-burgundy font-bold text-sm inline-flex items-center hover:bg-white transition-colors">
-                {t('hero.downloadCv')}
-              </a>
-              <a href={siteConfig.linkedin} target="_blank" rel="noopener noreferrer" class="h-12 px-[22px] rounded-full border-2 border-cream text-cream font-semibold text-sm inline-flex items-center hover:bg-cream/10 transition-colors">LinkedIn</a>
-              <a href={siteConfig.github} target="_blank" rel="noopener noreferrer" class="h-12 px-[22px] rounded-full border-2 border-cream text-cream font-semibold text-sm inline-flex items-center hover:bg-cream/10 transition-colors">GitHub</a>
+
+            <div class="flex flex-col gap-3.5">
+              {languagesSpoken.map((l) => (
+                <div class="flex items-center justify-between pb-2.5 border-b border-neutral-800 text-xs sm:text-sm">
+                  <span class="text-neutral-200 font-medium">
+                    {isAr ? l.name_ar : l.name}
+                  </span>
+                  <span class="font-mono text-xs text-gold-light">
+                    {isAr ? l.level_ar : l.level}
+                  </span>
+                </div>
+              ))}
             </div>
+          </div>
+
+          <!-- Antique Gold M/G Monogram Stamp -->
+          <div class="flex items-center justify-between pt-4 border-t border-border-dark">
+            <span class="font-mono text-xs text-neutral-400">FULL-STACK PORTFOLIO</span>
+            <span class="font-serif text-4xl sm:text-5xl font-bold tracking-tight text-gold opacity-90">
+              M/G
+            </span>
           </div>
         </div>
       </div>
-    </section>
-  </div>
+
+      <!-- Minimalist Bottom Copyright Bar -->
+      <div class="pt-6 border-t border-border-dark flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-400 font-mono">
+        <span>© {new Date().getFullYear()} {isAr ? siteConfig.name_ar : siteConfig.name} · {L('ALL RIGHTS RESERVED', 'كافة الحقوق محفوظة')}</span>
+        <span>CAIRO, EGYPT · FULL-STACK SOFTWARE ENGINEER</span>
+      </div>
+    </div>
+  </section>
 </BaseLayout>

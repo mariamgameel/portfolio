@@ -10,13 +10,14 @@ interface Props {
 
 const { lang, currentPath } = Astro.props;
 const t = useTranslations(lang);
+const isAr = lang === 'ar';
 
 const navItems = [
-  { label: t('nav.projects'), href: getLocalizedPath('/projects', lang) },
-  { label: t('nav.certificates'), href: getLocalizedPath('/certificates', lang) },
-  { label: t('nav.gallery'), href: getLocalizedPath('/gallery', lang) },
-  { label: t('nav.about'), href: getLocalizedPath('/about', lang) },
-  { label: t('nav.contact'), href: getLocalizedPath('/contact', lang) },
+  { label: isAr ? 'المشاريع' : 'WORK', href: getLocalizedPath('/projects', lang) },
+  { label: isAr ? 'عني' : 'ABOUT', href: getLocalizedPath('/about', lang) },
+  { label: isAr ? 'الشهادات' : 'CERTIFICATES', href: getLocalizedPath('/certificates', lang) },
+  { label: isAr ? 'المعرض' : 'GALLERY', href: getLocalizedPath('/gallery', lang) },
+  { label: isAr ? 'تواصل' : 'CONTACT', href: getLocalizedPath('/contact', lang) },
 ];
 
 const homeHref = getLocalizedPath('/', lang);
@@ -31,40 +32,23 @@ const targetLang: Lang = lang === 'en' ? 'ar' : 'en';
 const langSwitchPath = getLocalizedPath(currentPath, targetLang);
 ---
 
-<header class="sticky top-3 sm:top-5 z-50 w-full max-w-[1240px] mx-auto px-4 sm:px-6 pt-3 sm:pt-5">
-  <nav
-    class="bg-burgundy rounded-full ps-2 pe-2 sm:pe-3 py-2 flex items-center gap-3 sm:gap-6 shadow-marble-md"
-    aria-label="Main Navigation"
-  >
-    <!-- Home circle -->
-    <a
-      href={homeHref}
-      aria-label={t('nav.home')}
-      aria-current={normalize(currentPath) === normalize(homeHref) ? 'page' : undefined}
-      class="w-11 h-11 sm:w-[52px] sm:h-[52px] shrink-0 rounded-full border-2 border-[#E9DCC6] text-[#E9DCC6] flex items-center justify-center hover:bg-cream/10 transition-colors"
-    >
-      <Icon name="house" class="w-5 h-5 sm:w-6 sm:h-6" />
+<header class="sticky top-0 z-50 w-full bg-porcelain/95 backdrop-blur-md border-b border-border-light transition-all">
+  <div class="max-w-[1240px] mx-auto px-4 sm:px-8 py-5 flex items-center justify-between">
+    <!-- Brand Monogram -->
+    <a href={homeHref} class="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-obsidian no-underline flex items-baseline gap-0.5">
+      <span>{isAr ? 'م.ج' : 'MG'}</span>
+      <span class="text-gold">.</span>
     </a>
 
-    <!-- Identity -->
-    <a href={homeHref} class="flex flex-col leading-tight min-w-0 no-underline">
-      <span class="text-cream font-bold text-sm sm:text-[15px] truncate">
-        {lang === 'ar' ? 'مريم جميل' : 'Mariam Gameel'}
-      </span>
-      <span class="text-latte text-[11px] truncate">
-        {lang === 'ar' ? siteConfig.role_ar : siteConfig.role}
-      </span>
-    </a>
-
-    <!-- Desktop links -->
-    <div class="hidden lg:flex flex-1 items-center justify-center gap-1 xl:gap-2">
+    <!-- Desktop Navigation Links -->
+    <nav class="hidden md:flex items-center gap-7 lg:gap-9" aria-label="Main Navigation">
       {navItems.map((item) => {
         const active = isActive(item.href);
         return (
           <a
             href={item.href}
-            class={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
-              active ? 'bg-cream text-burgundy' : 'text-cream hover:bg-cream/10'
+            class={`font-sans text-[11px] font-semibold tracking-[0.18em] uppercase no-underline transition-colors ${
+              active ? 'text-obsidian border-b border-obsidian pb-0.5' : 'text-neutral-500 hover:text-obsidian'
             }`}
             aria-current={active ? 'page' : undefined}
           >
@@ -72,33 +56,34 @@ const langSwitchPath = getLocalizedPath(currentPath, targetLang);
           </a>
         );
       })}
-    </div>
+    </nav>
 
-    <div class="flex items-center gap-2 ms-auto lg:ms-0">
-      <!-- Language toggle -->
+    <!-- Header Actions -->
+    <div class="flex items-center gap-3 sm:gap-4">
+      <!-- Language Switcher -->
       <a
         href={langSwitchPath}
-        class="h-11 px-3.5 rounded-full border-2 border-latte/60 text-cream text-xs font-semibold flex items-center hover:bg-cream/10 transition-colors"
+        class="font-mono text-[11px] font-medium tracking-wider text-gold-dark border border-border-light hover:border-gold px-2.5 py-1 rounded no-underline transition-colors uppercase"
         aria-label={`Switch to ${targetLang === 'ar' ? 'Arabic' : 'English'}`}
       >
-        {t('nav.langToggle')}
+        {isAr ? 'EN' : 'EN / AR'}
       </a>
 
-      <!-- CV -->
+      <!-- Download CV Button -->
       <a
         href={siteConfig.cvUrl}
         download="Mariam_Gameel_CV.pdf"
-        class="hidden sm:inline-flex h-11 sm:h-12 items-center gap-2 px-5 whitespace-nowrap rounded-full bg-cream text-burgundy font-bold text-sm hover:bg-white transition-colors"
+        class="hidden sm:inline-flex items-center gap-2 bg-obsidian text-porcelain hover:bg-gold-dark text-[11px] font-semibold tracking-[0.14em] uppercase px-4 py-2.5 rounded-sm no-underline transition-colors"
       >
-        <Icon name="download" class="w-[18px] h-[18px]" />
+        <Icon name="download" class="w-3.5 h-3.5" />
         <span>{t('hero.downloadCv')}</span>
       </a>
 
-      <!-- Mobile menu button -->
+      <!-- Mobile Menu Toggle Button -->
       <button
         id="mobile-menu-btn"
         type="button"
-        class="lg:hidden w-11 h-11 rounded-full bg-cream text-burgundy flex items-center justify-center"
+        class="md:hidden w-10 h-10 rounded-sm border border-border-light flex items-center justify-center text-obsidian hover:border-gold"
         aria-label="Toggle navigation menu"
         aria-expanded="false"
         aria-controls="mobile-menu-drawer"
@@ -107,19 +92,19 @@ const langSwitchPath = getLocalizedPath(currentPath, targetLang);
         <Icon name="x" class="w-5 h-5 menu-close-icon hidden" />
       </button>
     </div>
-  </nav>
+  </div>
 
-  <!-- Mobile drawer -->
-  <div id="mobile-menu-drawer" class="hidden lg:hidden mt-2 p-3 rounded-[28px] bg-burgundy shadow-marble-lg">
-    <div class="flex flex-col gap-1">
-      <a href={homeHref} class="px-4 py-3 rounded-2xl text-sm font-semibold text-cream hover:bg-cream/10">
+  <!-- Mobile Drawer -->
+  <div id="mobile-menu-drawer" class="hidden md:hidden border-t border-border-light bg-porcelain px-4 py-4 shadow-editorial-lg">
+    <div class="flex flex-col gap-2">
+      <a href={homeHref} class="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-obsidian hover:text-gold">
         {t('nav.home')}
       </a>
       {navItems.map((item) => (
         <a
           href={item.href}
-          class={`px-4 py-3 rounded-2xl text-sm font-semibold ${
-            isActive(item.href) ? 'bg-cream text-burgundy' : 'text-cream hover:bg-cream/10'
+          class={`px-3 py-2 text-xs font-semibold uppercase tracking-wider ${
+            isActive(item.href) ? 'text-obsidian font-bold bg-neutral-100 rounded' : 'text-neutral-600 hover:text-obsidian'
           }`}
         >
           {item.label}
@@ -128,7 +113,7 @@ const langSwitchPath = getLocalizedPath(currentPath, targetLang);
       <a
         href={siteConfig.cvUrl}
         download="Mariam_Gameel_CV.pdf"
-        class="mt-2 flex items-center justify-center gap-2 h-12 rounded-2xl text-sm font-bold bg-cream text-burgundy"
+        class="mt-2 flex items-center justify-center gap-2 h-11 text-xs font-semibold uppercase tracking-wider bg-obsidian text-porcelain rounded-sm"
       >
         <Icon name="download" class="w-4 h-4" />
         <span>{t('hero.downloadCv')}</span>

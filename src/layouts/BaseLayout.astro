@@ -12,6 +12,8 @@ interface Props {
   image?: string;
   type?: 'website' | 'article';
   jsonLd?: Record<string, any>;
+  fullWidth?: boolean;
+  hideFooter?: boolean;
 }
 
 const {
@@ -20,7 +22,9 @@ const {
   lang = 'en',
   image = '/og-image.png',
   type = 'website',
-  jsonLd
+  jsonLd,
+  fullWidth = false,
+  hideFooter = false
 } = Astro.props;
 
 const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, '') : 'https://mariamgameel.github.io';
@@ -71,7 +75,7 @@ const structuredData = jsonLd || defaultPersonSchema;
 
     <!-- Favicon Set -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="theme-color" content="#6A1220" />
+    <meta name="theme-color" content="#FAF8F5" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content={type} />
@@ -90,7 +94,7 @@ const structuredData = jsonLd || defaultPersonSchema;
     <!-- Structured Data JSON-LD -->
     <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 
-    <!-- Optional Privacy-First Analytics (No cookies) -->
+    <!-- Optional Privacy-First Analytics -->
     {siteConfig.analyticsDomain && (
       <script
         defer
@@ -99,7 +103,7 @@ const structuredData = jsonLd || defaultPersonSchema;
       />
     )}
   </head>
-  <body class="min-h-screen bg-bg text-text-primary antialiased flex flex-col selection:bg-burgundy selection:text-cream">
+  <body class="min-h-screen bg-porcelain text-text-primary antialiased flex flex-col selection:bg-gold/30 selection:text-obsidian">
     <!-- Skip to main content for accessibility -->
     <a href="#main-content" class="skip-link">
       {lang === 'ar' ? 'تخطي إلى المحتوى الرئيسي' : 'Skip to main content'}
@@ -109,11 +113,17 @@ const structuredData = jsonLd || defaultPersonSchema;
     <Header lang={lang} currentPath={Astro.url.pathname} />
 
     <!-- Main Content Slot -->
-    <main id="main-content" class="flex-1 w-full max-w-[1240px] mx-auto px-4 sm:px-6 py-8 sm:py-10">
-      <slot />
-    </main>
+    {fullWidth ? (
+      <main id="main-content" class="flex-1 w-full">
+        <slot />
+      </main>
+    ) : (
+      <main id="main-content" class="flex-1 w-full max-w-[1240px] mx-auto px-4 sm:px-8 py-8 sm:py-12">
+        <slot />
+      </main>
+    )}
 
-    <!-- Footer -->
-    <Footer lang={lang} />
+    <!-- Global Footer -->
+    {!hideFooter && <Footer lang={lang} />}
   </body>
 </html>

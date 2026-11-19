@@ -36,6 +36,9 @@ export const siteConfig: SiteConfig = {
   analyticsDomain: process.env.PUBLIC_ANALYTICS_DOMAIN || ''
 };
 
+const baseUrl = (typeof import.meta !== 'undefined' && import.meta.env?.BASE_URL ? import.meta.env.BASE_URL : '/').replace(/\/$/, '');
+export const asset = (p: string) => `${baseUrl}${p.startsWith('/') ? p : '/' + p}`;
+
 export interface TechItem {
   name: string;
   category: 'languages' | 'frontend' | 'backend' | 'cloud_security';
@@ -78,12 +81,12 @@ export const languagesSpoken = [
   { name: 'Spanish', name_ar: 'الإسبانية', level: 'A1 Basic', level_ar: 'مبتدئ A1' }
 ];
 
-/** Photography used by the burgundy/sand design (served from /public/images). */
+/** Photography used across the site (served from /public/images). */
 export const photos = {
-  headshot: '/images/headshot.jpg',
-  capital: '/images/capital.jpg',
-  awardHolding: '/images/award-holding.jpg',
-  awardRecognition: '/images/award-recognition.jpg'
+  headshot: asset('/images/headshot.jpg'),
+  capital: asset('/images/capital.jpg'),
+  awardHolding: asset('/images/award-holding.jpg'),
+  awardRecognition: asset('/images/award-recognition.jpg')
 };
 
 export const education = {
@@ -93,12 +96,12 @@ export const education = {
 
 /** Certificates shown with their scanned image on the home page. */
 export const certificateShowcase = [
-  { img: '/images/certs/aws-cloud-practitioner.png', title: 'AWS Certified Cloud Practitioner', meta: 'Amazon Web Services · Jul 2026', alt: 'AWS Certified Cloud Practitioner certificate' },
-  { img: '/images/certs/meta-react-basics.png', title: 'React Basics', meta: 'Meta · Coursera · Apr 2026', alt: 'React Basics certificate from Meta' },
-  { img: '/images/certs/meta-version-control.png', title: 'Version Control', meta: 'Meta · Coursera · Mar 2026', alt: 'Version Control certificate from Meta' },
-  { img: '/images/certs/packt-build-automation-ci.png', title: 'Build Automation & Continuous Integration', meta: 'Packt · Coursera · May 2026', alt: 'Build Automation and CI certificate from Packt' },
-  { img: '/images/certs/packt-devops-git.png', title: 'Foundations of DevOps and Git', meta: 'Packt · Coursera · May 2026', alt: 'Foundations of DevOps and Git certificate from Packt' },
-  { img: '/images/certs/ibm-quality-agility.png', title: 'Delivering Quality Work with Agility', meta: 'IBM · Coursera · Jan 2026', alt: 'Delivering Quality Work with Agility certificate from IBM' }
+  { img: asset('/images/certs/aws-cloud-practitioner.png'), title: 'AWS Certified Cloud Practitioner', meta: 'Amazon Web Services · Jul 2026', alt: 'AWS Certified Cloud Practitioner certificate' },
+  { img: asset('/images/certs/meta-react-basics.png'), title: 'React Basics', meta: 'Meta · Coursera · Apr 2026', alt: 'React Basics certificate from Meta' },
+  { img: asset('/images/certs/meta-version-control.png'), title: 'Version Control', meta: 'Meta · Coursera · Mar 2026', alt: 'Version Control certificate from Meta' },
+  { img: asset('/images/certs/packt-build-automation-ci.png'), title: 'Build Automation & Continuous Integration', meta: 'Packt · Coursera · May 2026', alt: 'Build Automation and CI certificate from Packt' },
+  { img: asset('/images/certs/packt-devops-git.png'), title: 'Foundations of DevOps and Git', meta: 'Packt · Coursera · May 2026', alt: 'Foundations of DevOps and Git certificate from Packt' },
+  { img: asset('/images/certs/ibm-quality-agility.png'), title: 'Delivering Quality Work with Agility', meta: 'IBM · Coursera · Jan 2026', alt: 'Delivering Quality Work with Agility certificate from IBM' }
 ];
 
 /** Further completed courses listed as chips under the showcase. */

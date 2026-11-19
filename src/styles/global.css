@@ -1,8 +1,11 @@
-@import '@fontsource/montserrat/400.css';
-@import '@fontsource/montserrat/500.css';
-@import '@fontsource/montserrat/600.css';
-@import '@fontsource/montserrat/700.css';
-@import '@fontsource/montserrat/800.css';
+@import '@fontsource/cormorant-garamond/400.css';
+@import '@fontsource/cormorant-garamond/500.css';
+@import '@fontsource/cormorant-garamond/600.css';
+@import '@fontsource/cormorant-garamond/700.css';
+@import '@fontsource/plus-jakarta-sans/400.css';
+@import '@fontsource/plus-jakarta-sans/500.css';
+@import '@fontsource/plus-jakarta-sans/600.css';
+@import '@fontsource/plus-jakarta-sans/700.css';
 @import '@fontsource/jetbrains-mono/400.css';
 @import '@fontsource/jetbrains-mono/500.css';
 @import '@fontsource/cairo/400.css';
@@ -14,100 +17,110 @@
 @tailwind utilities;
 
 :root {
-  /* Design tokens: burgundy & sand (RGB channels so Tailwind opacity modifiers work) */
-  --c-burgundy: 106 18 32;      /* #6A1220 */
-  --c-burgundy-dark: 74 11 21;  /* #4A0B15 */
-  --c-wine: 43 10 16;           /* #2B0A10 */
-  --c-cocoa: 74 42 34;          /* #4A2A22 */
-  --c-muted: 91 58 46;          /* #5B3A2E */
-  --c-taupe: 168 149 126;       /* #A8957E  page background */
-  --c-sand: 220 203 176;        /* #DCCBB0  cards */
-  --c-cream: 243 233 216;       /* #F3E9D8  light surfaces / text on burgundy */
-  --c-latte: 227 207 180;       /* #E3CFB4  labels on burgundy */
-  --c-blush: 234 219 196;       /* #EADBC4  body text on burgundy */
-  --c-divider: 185 164 134;     /* #B9A486 */
+  /* Architectural Editorial Palette Tokens */
+  --c-porcelain: 250 248 245;      /* #FAF8F5 */
+  --c-obsidian: 17 17 19;          /* #111113 */
+  --c-obsidian-card: 24 24 27;     /* #18181B */
+  --c-obsidian-inner: 32 32 36;    /* #202024 */
+  --c-gold: 186 155 112;           /* #BA9B70 */
+  --c-gold-light: 203 178 141;     /* #CBB28D */
+  --c-gold-dark: 151 121 83;       /* #977953 */
+  --c-border-light: 231 225 215;   /* #E7E1D7 */
+  --c-border-dark: 38 38 42;       /* #26262A */
+  --c-text-dark: 26 26 28;         /* #1A1A1C */
+  --c-text-muted: 110 106 100;     /* #6E6A64 */
+
+  /* Compatible mappings */
+  --c-burgundy: 26 26 28;          /* dark text/accents */
+  --c-burgundy-dark: 17 17 19;
+  --c-wine: 26 26 28;
+  --c-cocoa: 74 70 65;
+  --c-muted: 110 106 100;
+  --c-taupe: 250 248 245;
+  --c-sand: 244 239 234;
+  --c-cream: 255 255 255;
+  --c-latte: 186 155 112;
+  --c-blush: 235 229 220;
+  --c-divider: 231 225 215;
 
   --color-success: #2F6B3F;
   --color-error: #8F1D2C;
-  --shadow-color: rgba(43, 10, 16, 0.12);
+  --shadow-color: rgba(26, 26, 28, 0.08);
 }
 
 html {
-  background-color: rgb(var(--c-taupe));
-  color: rgb(var(--c-wine));
+  background-color: rgb(var(--c-porcelain));
+  color: rgb(var(--c-text-dark));
   scroll-behavior: smooth;
 }
 
 body {
-  font-family: Montserrat, system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 [dir='rtl'],
 [dir='rtl'] body {
-  font-family: 'Cairo', Montserrat, system-ui, sans-serif;
+  font-family: 'Cairo', 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
 a {
   text-underline-offset: 3px;
 }
 
-/* Generic card used across inner pages */
+/* Card components */
 .bento-card {
-  background-color: rgb(var(--c-sand));
-  border: 1px solid transparent;
+  background-color: #FFFFFF;
+  border: 1px solid rgb(var(--c-border-light));
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .bento-card:hover {
-  border-color: rgb(var(--c-burgundy) / 0.35);
+  border-color: rgb(var(--c-gold));
 }
 
-/* Kept for compatibility: now a flat sand surface */
-.marble-texture {
-  background-color: rgb(var(--c-sand));
-}
-
-/* Burgundy pill section header (icon circle + title) */
 .pill-header {
   display: flex;
   align-items: center;
   gap: 0.875rem;
-  background: rgb(var(--c-burgundy));
-  color: rgb(var(--c-cream));
+  background: rgb(var(--c-obsidian));
+  color: #FFFFFF;
   border-radius: 999px;
   padding: 0.625rem 1.25rem 0.625rem 0.625rem;
 }
+
 [dir='rtl'] .pill-header {
   padding: 0.625rem 0.625rem 0.625rem 1.25rem;
 }
+
 .pill-icon {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.25rem;
+  height: 2.25rem;
   flex-shrink: 0;
   border-radius: 999px;
-  border: 2px solid #e9dcc6;
-  color: #e9dcc6;
+  border: 1.5px solid rgb(var(--c-gold));
+  color: rgb(var(--c-gold));
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 :focus-visible {
-  outline: 2px solid rgb(var(--c-burgundy));
+  outline: 2px solid rgb(var(--c-gold));
   outline-offset: 2px;
 }
 
 .skip-link {
   position: absolute;
   top: -100px;
-  left: 1rem;
-  z-index: 100;
+  inset-inline-start: 1rem;
   padding: 0.75rem 1.25rem;
-  background: rgb(var(--c-burgundy));
-  color: rgb(var(--c-cream));
-  border-radius: 999px;
-  font-size: 0.875rem;
+  background: rgb(var(--c-obsidian));
+  color: #FFFFFF;
+  border-radius: 4px;
   font-weight: 600;
+  font-size: 0.875rem;
+  z-index: 100;
   transition: top 0.2s ease;
 }
 
@@ -115,11 +128,12 @@ a {
   top: 1rem;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+/* Rotating seal animation */
+@keyframes rotateSeal {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-rotate-seal {
+  animation: rotateSeal 24s linear infinite;
 }
